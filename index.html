@@ -1,52 +1,34 @@
 ---
 layout: bootcamp
 root: .
-venue: Euphoric State University
-address: 123 College Street, Euphoria
-country: United-States
-humandate: Feb 17-18, 2020
-humantime: 9:00 am - 4:30 pm
-startdate: 2020-06-17
-enddate: 2020-06-18
-latlng: 41.7901128,-87.6007318
-registration: restricted
-instructor: ["Grace Hopper", "Alan Turing"]
-contact: admin@software-carpentry.org
+venue: Cranfield University
+address: College Road, Cranfield, MK43 0AL, Bedfordshire
+country: United-Kingdom
+humandate: Jul 21-23, 2014
+humantime: 9:30 am - 5:00 pm
+startdate: 2014-07-21
+enddate: 2014-07-23
+latlng: 52.074389,-0.629225
+registration: open
+instructor: ["Mike Jackson", "Andrew Turner", "Arno Proeme"]
+contact: host-archer@software-carpentry.org
 ---
-<!--
-    Edit the values in the parameter block above to be appropriate for your bootcamp.
-    Please use three-letter month names for the 'humandate' field.
--->
 
-<!-- Remove the block below. -->
-<div align="center">
-  <p><strong><em>
-      This page is a template for bootcamp home pages.
-      <br/>
-      Please see
-      <a href="https://github.com/swcarpentry/bc">https://github.com/swcarpentry/bc</a>
-      for instructions on how to create
-      a repository for your bootcamp.
-  </em></strong></p>
-</div>
-
-<!--
-    This block includes the Eventbrite registration widget if 'eventbrite' has been set in the header.
--->
-{% if page.eventbrite %}
-<iframe src="http://www.eventbrite.com/tickets-external?eid={{page.eventbrite}}&ref=etckt" frameborder="0" width="100%" scrolling="auto"></iframe>
-{% endif %}
-
-<h2>General Information</h2>
+<h2>
+Software Carpentry Boot camp and Introduction to Scientific Programming in Python
+</h2>
 
 <p>
-  <a href="http://software-carpentry.org">Software Carpentry</a>'s mission
-  is to help scientists and engineers become more productive
-  by teaching them basic lab skills for computing
-  like program design, version control, data management, and task automation.
-  This two-day hands-on bootcamp will cover basic concepts and tools;
-  participants will be encouraged to help one another
-  and to apply what they have learned to their own research problems.
+<a href="http://www.archer.ac.uk">ARCHER</a>, the UK's new national supercomputing service, offers training in software development and high-performance computing to scientists and researchers across the UK. As part of our training service we are running a 3 day Software Carpentry boot camp and Introduction to Scientific Programming in Python.
+</p>
+<p>
+<a href="http://software-carpentry.org">Software Carpentry</a> boot camps help researchers become more productive by teaching software development skills that enable more to be done, in less time, and with less pain. We will cover skills including version control, task automation, good programming practice and automated testing. These are skills that, in an ideal world, researchers would master before tacking anything with "cloud" or "peta" or "HPC" in their name, skills that enable researchers to optimise their time and provide them with a secure basis to optimise and parallelise their code.
+</p>
+<p>
+Our Introduction to Scientific Programming in Python, will provide an introduction to Python on ARCHER. We will introduce Python's capabilities for scientific computing, in particular the Cython, mpi4py, NumPy, SciPy and matplotlib Python libraries. We will also introduce how to interface Python with C and Fortran codes.
+</p>
+<p>
+This course is being run by <a href="http://www.epcc.ed.ac.uk">EPCC</a>, as part of ARCHER, and <a href="http://www.cranfield.ac.uk">Cranfield University</a>. The course is in collaboration with EPCC's <a href="http://www.prace-project.eu/PRACE-Advanced-Training-Centres">PRACE Advanced Training Centre</a> (PATC), and Software Carpentry, a <a href="https://wiki.mozilla.org/ScienceLab">Mozilla Science Lab</a> initiative.
 </p>
 
 <!-- This block displays the instructors' names if they are available. -->
@@ -57,14 +39,19 @@ contact: admin@software-carpentry.org
 </p>
 {% endif %}
 
-<!--
-    Modify this block to reflect the target audience for your bootcamp.
-    In particular, if it is only open to people from a particular institution,
-    or if specialized prerequisite knowledge is required, please mention that.
--->
 <p>
   <strong>Who:</strong>
-  The course is aimed at graduate students and other researchers.
+The course is aimed at graduate students, post-docs and other researchers. You must have some experience of writing code or scripts and be familiar with programming concepts including conditionals, loops, arrays and functions. You should also be comfortable with using the bash shell
+<!--
+TODO
+TODO
+TODO
+our GitHub course page has a link to an online tutorial
+  You should be familiar with using the bash shell for file and directory management (e.g. ls, cp, rm, mkdir, rmdir, mv). For an introduction to the shell, please see Software Carpentry's lessons on <a href="http://software-carpentry.org/v5/novice/shell/00-intro.html"> Introducing the Shell</a>, <a href="http://software-carpentry.org/v5/novice/shell/01-filedir.html">Files and Directories</a> and <a href="http://software-carpentry.org/v5/novice/shell/02-create.html">Creating Things</a>.
+TODO
+TODO
+TODO
+-->
 </p>
 
 <!--
@@ -81,19 +68,16 @@ contact: admin@software-carpentry.org
 </p>
 {% endif %}
 
-<!--
-    Modify the block below if there are any special requirements.
--->
 <p>
   <strong>Requirements:</strong>
-  Participants must bring a laptop with a few specific software packages installed
-  (listed below).
+The course will be hands-on, and you are encouraged to bring your own laptop (you'll be asked to install some software before you arrive). Alternatively, PCs will provided for use.
 </p>
 
 <!--
     This block automatically inserts a contact email address if one has been specified for the page.
     If one hasn't, this block inserts the generic contact address for Software Carpentry.
 -->
+
 <p>
   <strong>Contact</strong>:
   Please mail
@@ -107,34 +91,66 @@ contact: admin@software-carpentry.org
 
 <hr/>
 
+<h2>Registration</h2>
+
+To register please, visit the <a href="http://www.archer.ac.uk/training/">ARCHER training page</a>.
+
+<hr/>
+
 <!--
     Edit this block to show the syllabus and schedule for your bootcamp.
 -->
 <h2>Schedule</h2>
 
-<table class="table table-striped">
-  <tr> <td>Monday</td>  <td>09:00</td>  <td>Introduction to task automation with the Unix shell</td> </tr>
-  <tr> <td></td>        <td></td>       <td>Coffee will be served at 10:30.</td> </tr>
-  <tr> <td></td>        <td>12:00</td>  <td>Lunch break</td> </tr>
-  <tr> <td></td>        <td>13:00</td>  <td>Building programs with Python</td> </tr>
-  <tr> <td></td>        <td></td>       <td>Coffee will be served at 14:30.</td> </tr>
-  <tr> <td></td>        <td>16:00</td>  <td>Wrap-up</td> </tr>
-  <tr> <td>Tuesday</td> <td>09:00</td>  <td>Version control with Git</td> </tr>
-  <tr> <td></td>        <td></td>       <td>Coffee will be served at 10:30.</td> </tr>
-  <tr> <td></td>        <td>12:00</td>  <td>Lunch break</td> </tr>
-  <tr> <td></td>        <td>13:00</td>  <td>Managing data with SQL</td> </tr>
-  <tr> <td></td>        <td></td>       <td>Coffee will be served at 14:30.</td> </tr>
-  <tr> <td></td>        <td>15:00</td>  <td>Putting it all together</td> </tr>
-  <tr> <td></td>        <td>16:00</td>  <td>Wrap-up</td> </tr>
-</table>
+<p>
+Monday:
+</p>
+<ul>
+<li>
+09:30 - 10:00 Registration and software set-up
+</li>
+<li>
+10:00 - 10:30 Welcome
+</li>
+<li>
+10:30 - 11:30 Shell refresher, hints and tips
+</li>
+<li>
+11:30 - 15:30 Using version control (Git) to manage and share information
+</li>
+<li>
+15:30 - 17:00 Automation and make
+</li>
+</ul>
+Tuesday 22nd July:
+<ul>
+<li>
+09:30 - 11:30 Introduction to good programming practice and Python
+</li>
+<li>
+11:30 - 17:00 Scientific programming in Python
+</li>
+<li>
+</ul>
+Wednesday 23rd July
+<ul>
+<li>
+09:30 - 12:30 How (and how much) to test programs
+</li>
+<li>
+13:30 - 14:30 Pulling everything together - best practices for scientific computing
+</li>
+<li>
+14:30 - 17:00 How does this work in practice? Q/A discussion
+</li>
+</ul>
 
 <hr/>
 
 <!--
-    Edit the setup instructions in _includes/setup.html to reflect your bootcamp.
-    (In particular, most bootcamps teach either Python or R, not both.)
--->
-
+TODO
+TODO
+TODO
 <h2>Setup</h2>
 
 <p>
@@ -146,3 +162,29 @@ contact: admin@software-carpentry.org
 </p>
 
 {% include setup.html %}
+
+<hr/>
+
+<h2>Check your setup</h2>
+
+<p>
+To test you have everything, download the following Python scripts and
+run them within your bash shell: 
+</p>
+<ul>
+<li><a href="./setup/swc-installation-test-1.py">swc-installation-test-1.py</a> 
+- checks Python version
+<li><a href="./setup/swc-installation-test-2.py">swc-installation-test-2.py</a> 
+- checks Python and shell packages
+</ul>
+<p>
+For example
+</p>
+<pre>
+python swc-installation-test-1.py
+python swc-installation-test-2.py
+</pre>
+TODO
+TODO
+TODO
+-->
