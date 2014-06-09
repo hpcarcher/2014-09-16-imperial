@@ -41,9 +41,8 @@
     </p>
     <h4>R</h4>
     <p>
-      R is a programming language that specializes in statistical
-      computing. It is a powerful tool for exploratory data analysis. To
-      interact with R, we will
+      <a href="http://www.r-project.org">R</a> is a programming language that is especially powerful for
+      data exploration, visualization, and statistical analysis. To interact with R, we will
       use <a href="http://www.rstudio.com/">RStudio</a>, an interactive
       development environment (IDE).
     </p>
@@ -52,6 +51,18 @@
       SQL is a specialized programming language used with databases.
       We use a simple database manager called <a href="http://www.sqlite.org/">SQLite</a>,
       either directly or through a browser plugin.
+    </p>
+  </div>
+  <div class="span6">
+    <h4>Make</h4>
+    <p>
+      Originally invented to manage compilation of programs written in
+      languages like C, Make can be used to automatically update any set
+      of files that depend on another set of files. This makes it a good
+      solution for many data analysis and data management
+      problems. While there are many build tools now in existence
+      (e.g. ANT and CMake) they share the same fundamental concepts as
+      Make. 
     </p>
   </div>
 </div>
@@ -74,7 +85,7 @@
     <h4>Git Bash</h4>
     <p>
       Install Git for Windows by download and running
-      <a href="https://msysgit.googlecode.com/files/Git-1.8.4-preview20130916.exe">the installer</a>.
+      <a href="http://msysgit.github.io/">the installer</a>.
       This will provide you with both Git and Bash in the Git Bash program.
     </p>
     <h4>Software Carpentry Installer</h4>
@@ -82,7 +93,7 @@
     <p>After installing Python and Git Bash:</p>
     <ul>
       <li>
-        Download the <a href="https://raw.github.com/swcarpentry/bc/master/setup/swc-windows-installer.py">installer</a>.
+        Download the <a href="{{site.windows_installer_path}}">installer</a>.
       </li>
       <li>
         If the file opens directly in the browser select <strong>File&rarr;Save Page As</strong>
@@ -95,6 +106,10 @@
   </div>
   <div class="span6">
     <h4>Editor</h4>
+    <p>
+      <code>nano</code> is the editor installed by the Software Carpentry Installer,
+      it is a basic editor integrated into the lesson material.
+    </p>
     <p>
       <a href="http://notepad-plus-plus.org/">Notepad++</a> is a
       popular free code editor for Windows.
@@ -117,6 +132,33 @@
       and put it in the directory where you are running examples.
       Alternatively,
       you may install the Firefox SQLite browser plugin described <a href="#firefox-sqlite">below</a>.
+    </p>
+  </div>
+  <div class="span6">
+    <h4>Make</h4>
+    <p>
+    Once you have installed Git Bash you can install Make by:
+    <ul>
+    <li>
+    Download <code>make.exe</code> from <a
+href="https://github.com/msysgit/msysgit/blob/master/bin/make.exe?raw=true">here</a>
+    </li>
+    <li>
+    Place it in the <code>bin</code> directory where you installed Git
+    Bash e.g. <code>C:\Program Files (x86)\Git\bin</code>.
+    </li>
+    <li> 
+    To test: open a Git Bash window, type <code>make</code>, and press
+    Enter.
+    </li>
+    <li> 
+    You should see the following message
+    <pre>make: *** No targets specified and no makefile found. Stop.</pre>
+    This means that Make was successfully installed.
+    Otherwise, you'll see this error message:
+    <pre>bash: make: command not found</pre>
+    </li>
+    </ul>
     </p>
   </div>
 </div>
@@ -178,6 +220,34 @@
       you may install the Firefox SQLite browser plugin described <a href="#firefox-sqlite">below</a>.
     </p>
   </div>
+  <div class="span6">
+    <h4>Make</h4>
+    <p>
+    If you do not already have access to <code>make</code> from within
+    your shell, you will need to install XCode (which is free, but
+    over a gigabyte to download). 
+    </p>
+    <ul>
+      <li>Go to the Apple app store</li>
+      <li>Search for XCode</li>
+      <li>Click <strong>Free</strong></li>
+      <li>Click <strong>Install App</strong></li>
+    </ul>
+    <p>
+    Once XCode has installed:
+    </p>
+    <ul>
+      <li>Click <strong>Applications</strong></li>
+      <li>Click <strong>XCode</strong></li>
+      <li>Select <strong>XCode&rarr;Preferences...</strong></li>
+      <li>Click <strong>Downloads</strong></li>
+      <li>Select <strong>Command Line Tools</strong></li>
+      <li>Click <strong>Install</strong></li>
+    </ul>
+    <p>
+    You will now be able to run <code>make</code> within your shell.
+    </p>
+  </div>
 </div>
 
 <h3>Linux</h3>
@@ -195,7 +265,7 @@
     <p>
       If Git is not already available on your machine you can try
       to install it via your distro's package manager
-      (e.g. <code>apt-get</code>).
+      (e.g. <code>apt-get</code> or <code>yum</code>).
     </p>
     <h4>Editor</h4>
     <p>
@@ -208,8 +278,8 @@
       You can download the binary files for your distribution
       from <a href="http://cran.r-project.org/index.html">CRAN</a>. Or
       you can use your package manager, e.g. for Debian/Ubuntu
-      run <code>apt-get install r-base</code>. Also, please install
-      the
+      run <code>apt-get install r-base</code> or <code>yum install R</code>. 
+      Also, please install the
       <a href="http://www.rstudio.com/ide/download/desktop">RStudio IDE</a>.
     </p>
     <h4>SQLite</h4>
@@ -254,6 +324,11 @@
         distribution the default Python).
       </li>
     </ol>
+    <h4>Make</h4>
+    <p>
+    Make is a standard tool on Linux systems and should already be
+    available.
+    </p>
   </div>
 </div>
 
