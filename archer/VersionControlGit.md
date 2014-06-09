@@ -474,6 +474,7 @@ BitBucket:
 * Click Create Repository.
 
 Question: is publicly visible code on BitBucket or GitHub open source?
+
 Answer: yes, but only if it has an open source licence. Otherwise, by default, it is "all rights reserved".
 
 'Push' `master` branch to GitHub:
