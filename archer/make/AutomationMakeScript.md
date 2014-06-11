@@ -130,7 +130,7 @@ Dependencies between files must make up a directed acyclic graph.
 Exercise 1 - add a rule 
 -----------------------
 
-See AutomationMakeExercises.md.
+See [exercises](AutomationMakeExercises.md).
 
 Solution:
 
@@ -226,7 +226,7 @@ Replace `.dat` targets and dependencies with a single target and dependency:
 Exercise 2 - simplify a rule 
 ----------------------------
 
-See AutomationMakeExercises.md.
+See [exercises](AutomationMakeExercises.md).
 
 You will need an automatic variable `$<` which means 'use the first dependency only'.
 
@@ -254,7 +254,7 @@ Use a 'macro', a Make variable:
 Exercise 3 - use a macro
 ------------------------
 
-See AutomationMakeExercises.md.
+See [exercises](AutomationMakeExercises.md).
 
 Solution:
 
@@ -298,7 +298,7 @@ Displays commands that make would run.
 Exercise 4 - add another processing stage
 -----------------------------------------
 
-See AutomationMakeExercises.md.
+See [exercises](AutomationMakeExercises.md).
 
 Completed makefile and configuration file
 -----------------------------------------
