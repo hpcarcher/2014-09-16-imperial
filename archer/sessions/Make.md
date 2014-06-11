@@ -42,7 +42,7 @@ Automated build:
  * Source code => compiler => library or executable.
  * Configuration and data files => processor => data files.
 
-See [Not just for compiling code](notjustforcode.jpg).
+See [Not just for compiling code](MakeUses.jpg).
 
 Example:
 
@@ -130,7 +130,7 @@ Dependencies between files must make up a directed acyclic graph.
 Exercise 1 - add a rule 
 -----------------------
 
-See [exercises](AutomationMakeExercises.md).
+See [exercises](MakeExercises.md).
 
 Solution:
 
@@ -226,7 +226,7 @@ Replace `.dat` targets and dependencies with a single target and dependency:
 Exercise 2 - simplify a rule 
 ----------------------------
 
-See [exercises](AutomationMakeExercises.md).
+See [exercises](MakeExercises.md).
 
 You will need an automatic variable `$<` which means 'use the first dependency only'.
 
@@ -254,7 +254,7 @@ Use a 'macro', a Make variable:
 Exercise 3 - use a macro
 ------------------------
 
-See [exercises](AutomationMakeExercises.md).
+See [exercises](MakeExercises.md).
 
 Solution:
 
@@ -298,7 +298,7 @@ Displays commands that make would run.
 Exercise 4 - add another processing stage
 -----------------------------------------
 
-See [exercises](AutomationMakeExercises.md).
+See [exercises](MakeExercises.md).
 
 Completed makefile and configuration file
 -----------------------------------------
@@ -340,7 +340,7 @@ To recreate all `.dat` and `.jpg` files:
 Conclusion
 ----------
 
-See [the purpose of Make](The-purpose-of-make.png).
+See [the purpose of Make](MakePurpose.png).
 
 * Automates repetitive tasks
 * Reduces errors
