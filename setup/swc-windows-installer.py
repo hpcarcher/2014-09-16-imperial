@@ -215,7 +215,6 @@ def main():
     create_nosetests_entry_point(python_scripts_directory=bin_dir)
     install_nano(install_directory=nano_dir)
     install_nanorc(install_directory=nanorc_dir)
-    print sqlite_dir
     install_sqlite(install_directory=sqlite_dir)
     update_bash_profile(extra_paths=(nano_dir, sqlite_dir, bin_dir))
 
