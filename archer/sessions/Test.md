@@ -215,7 +215,7 @@ Solution:
     DELIMITERS=".,;:?$@^<>#%`!*-=()[]{}/\"\'"
     TRANSLATE_TABLE = string.maketrans(DELIMITERS, len(DELIMITERS) * " ")
 
-    def add_frequencies(line, frequencies, min_length = DEFAULT_MIN_LENGTH):
+    def update_word_counts(line, counts):
       line = string.translate(line, TRANSLATE_TABLE) 
       words = line.split()
       ...
@@ -264,9 +264,11 @@ Question: what is the problem?
 
 Answer: the meta-data. `diff` is too simplistic now. 
 
-One workaround would be to use shell commands to trim off the problematic lines. This is just delaying the problem. The files may have too complex a structure for such manipulations.
+Workaround 0 use shell commands to slice out problematic lines. But, files may have too complex a structure for simple manipulations.
 
-Write our tests in a programming language.
+Typically want fine-grained tests of equality between data files, using information about the file content and structure. Discriminate between syntactic and semantic content.
+
+Principle applies not only when comparing data files en masse but also when testing components at any level of granularity.
 
 When 0.1 + 0.2 == 3.00000000004
 -------------------------------
@@ -282,13 +284,9 @@ Answer: floating point values.
     > print a + b == 0.3
     > a + b
 
-Computers don't do floating point arithmetic too well. This can make simple tests for the equality of two floating point values problematic due to imprecision in the values being compared. 
+Computers don't do floating point arithmetic too well. Simple tests for the equality of two floating point values are problematic due to imprecision in values.
 
-Will typically want finer grained tests of equality between data files.
-
-For floating point values, compare for equality within a given threshold, or delta, for example we may consider *expected* and *actual* to be equal if *expected - actual < 0.000000000001*.
-
-This applies not only for comparing data files en masse but also when testing components at any level of granularity.
+Compare for equality within a given threshold, or delta e.g. *expected* and *actual* to be equal if *expected - actual < 0.000000000001*.
 
 Testing at finer-granularities - towards unit tests
 ---------------------------------------------------
@@ -299,7 +297,7 @@ If every component has a set of tests then changes to the component can be teste
 
 It can be quicker to discover a problem when testing a 10 line function in isolation then testing it as part of an end-to-end application which may take 1 hour to run and may not even, depending upon the inputs, invoke that function. 
 
-The finest level of granularity is called a unit test, typically of individual functions, where a unit is the smallest testable part of an application. This could be a function or module, method or class.
+The finest level of granularity is a unit test - a unit is the smallest testable part of an application e.g. function or module, method or class.
 
 Exercise 3 - propose some tests for `wordcount.py`
 --------------------------------------------------
@@ -312,113 +310,144 @@ Many examples exist including:
 
 `load_text(file)`
 
-* A standard file returns a list of length equal to the number of lines in the file.
+* A file returns a list of length equal to the number of lines in the file.
 * An empty file returns an empty list.
 * A non-existent file raises an error.
 
-`add_frequencies(line, frequencies, min_length = DEFAULT_MIN_LENGTH)`
+'save_word_counts(file, counts)'
+
+* An empty list results in an empty file.
+* A non-empty list results in a file with a number of lines equal to the number of tuples + 5 (for the meta-data lines).
+
+`load_word_counts(file)`
+
+* A file with no comments (prefixed by `#`) returns a list of length equal to the number of lines in the file.
+* A file only with comments returns an empty list.
+* An empty file returns an empty list.
+* A non-existent file raises an error.
+
+`update_word_counts(line, counts)`
 
 * A sentence of distinct words and an empty dictionary of frequencies results in a dictionary with an entry for each word with a count of 1.
 * A zero-length sentence and an empty dictionary of frequencies results in an empty dictionary of frequencies.
+* A sentence of delimiters and an empty dictionary of frequencies results in an empty dictionary of frequencies.
 * A sentence of distinct words and a dictionary with entries for all of those words results in each count in the dictionary being increased by 1.
-* A sentence of words each less than 3 and a min_length of 4 and an empty dictionary results in an empty dictionary.
 
-`get_frequencies(lines, min_length = DEFAULT_MIN_LENGTH)`
+`calculate_word_counts(lines)`:
 
-* An empty list returns an empty list of pairs.
-* Other tests as for `add_frequencies` but across a number of lines.
+* An empty list returns an empty dictionary.
+* Other tests as for `update_word_counts` but across a number of lines.
 
-`save_pairs(file, pairs)`
+`word_count_dict_to_tuples(counts, decrease = True)`:
 
-* An ampty list results in an empty file.
-* A non-empty list results in a file with a number of lines equal to the number of pairs in the list.
+* An empty dictionary returns an empty list.
+* A dictionary of words all with equal counts returns a list of tuples, one for each word.
+* A dictionary of words with distinct counts returns list of tuples in descending order.
+* A dictionary of words with distinct counts returns list of tuples in ascending order if `decrease = False`.
+
+`filter_word_counts(counts, min_length = 1)`
+
+* An empty list returns an empty list.
+* A list of tuples of words of length 3 or less, returns an empty list if `min_length = 3`.
 
 A unit test for `add_frequencies`
 ---------------------------------
 
 Create `test_wordcount.py`:
 
-    from wordcount import add_frequencies
+    from wordcount import update_word_counts
 
-    def test_add_frequencies():
+    def test_update_word_counts():
+      line = "software! software! software!"
+      counts = {}
+      update_word_counts(line, counts)
 
-
-
-What is:
+For checking outputs and behaviours, [nose](https://pypi.python.org/pypi/nose/) provides a library of functions. These include tests for equality, inequality, boolean values, thrown exceptions etc.
 
     from nose.tools import assert_equal
 
+    assert_equal(1, len(counts))
+    assert_equal(3, counts.get("software"))
 
+    test_update_word_counts()
 
+    $ python test_wordcount.py
 
-import unittests
-class MyTests(unittest.TestCase):
-if __name__ == '__main__':
-    unittest.main()
-A test case is defined by subclassing `unittest.TestCase`. We have defined two rather uninteresting tests. If we run this we get:
-TestHarness.py
+`nose` also comes with a tool, `nosetests` which automatically finds, runs and reports on tests.
 
+    $ nosetests test_wordcount.p
 
+`.` denotes successful test function calls.
 
-nosetests
----------
+`nosetests` uses reflection to find out the test functions, so remove the `test_update` call.
 
-Why did I call tests test_?
+    $ nosetests test_wordcount.py
 
-[nose](https://pypi.python.org/pypi/nose/) automatically finds, runs and reports on tests.
+Add another test:
 
-[xUnit test framework](http://en.wikipedia.org/wiki/XUnit).
+    def test_update_word_counts_distinct():
+      line = "software carpentry software training"
+      counts = {}
+      update_word_counts(line, counts)
+      assert_equal(3, len(counts))
+      assert_equal(2, counts.get("software"))
+      assert_equal(1, counts.get("carpentry"))
+      assert_equal(1, counts.get("training"))
+
+`nose` is an [xUnit test framework](http://en.wikipedia.org/wiki/XUnit).
 
 JUnit, CUnit, FUnit, ...
 
 `test_` file and function prefix, `Test` class prefix.
 
-    $ nosetests test_morse.py
-
-`.` denotes successful tests.
-
-Remove `__main__`.
-
-    $ nosetests test_morse.py
-
 xUnit test report, standard format, convert to HTML, present online.
 
-    $ nosetests --with-xunit test_morse.py
+    $ nosetests --with-xunit test_wordcount.py
     $ cat nosetests.xml
 
-`nose` defines additional functions which can be used to check for a rich range of conditions e.g..
+Defensive programming
+---------------------
 
-    $ python
-    >>> from nose.tools import *
-    >>> expected = 123
-    >>> actual = 123
-    >>> assert_equal(expected, actual)
-    >>> actual = 456
-    >>> assert_equal(expected, actual)
-    >>> expected = "GATTACCA"
-    >>> actual = ["GATC", "GATTACCA"]
-    >>> assert_true(expected in actual)
-    >>> assert_false(expected in actual)
+Suppose someone decides to pass an invalid set of counts to `calculate_percentages`
 
-Problem
--------
+    from wordcount import calculate_percentages
 
-End to end is fine!
-Same applies to others
+    counts = [("software", 1), ("software", -4)]
+    print calculate_percentages(counts)
 
-CAN FLOATING POINT BE DONE HERE
-    >>> assert_true("GTA" in actual, "Expected value was not in the output list")
+    $ python test_wordcount.py
 
+Assume that mistakes will happen and guard against them.
 
+    def calculate_percentages(counts):
+      total = 0
+      for count in counts:
+        assert count[1] >= 0
+        total += count[1]
 
+    $ python test_wordcount.py
 
+Defensive programming. 
 
+Programs like Firefox  are full of assertions: 10-20% of their code is to check that the other 80-90% is working correctly.
 
+Types:
 
+* Precondition - must be true at the start of a function in order for it to work correctly.
+* Postcondition - guaranteed to be true when a function finishes.
+* Invariant - always true at a particular point inside a piece of code.
 
+Help other developers understand program and whether their understanding matches the code.
 
+Users should never see these sorts of failure!
 
+Test behaviour in the presence of invalid inputs:
 
+    from nose.tools import assert_raises
+
+    def test_calculate_percentages_invalid():
+      counts = [("software", 1), ("software", -4)]
+      assert_raises(AssertionError, calculate_percentages, counts)
 
 Exercise 4 - write more unit tests for `wordcount.py`
 -----------------------------------------------------
@@ -427,91 +456,44 @@ See [exercises](TestExercises.md).
 
 Allow 15 minutes or so.
 
+Floating point numbers
+----------------------
 
+    $ python
+    > from nose.tools import assert_almost_equal
+    > expected = 2
+    > expected = 2.000001
+    > actual = 2.0000000001
+    > assert_almost_equal(expected, actual, 0)
+    > assert_almost_equal(expected, actual, 1)
+    > assert_almost_equal(expected, actual, 2)
+    > assert_almost_equal(expected, actual, 3)
+    > assert_almost_equal(expected, actual, 4)
+    > assert_almost_equal(expected, actual, 5)
+    > assert_almost_equal(expected, actual, 6)
 
+`nose.testing` uses absolute tolerance: abs(x, y) <= delta
 
+Python [decimal](http://docs.python.org/2/library/decimal.html), floating-point arithmetic functions.
 
+[Numpy](http://www.numpy.org/)'s `numpy.testing` uses relative tolerance: abs(x, y) <= delta * (max(abs(x), abs(y)). 
 
+Two files produced by the same software, with the same inputs, under the same configuration. One job run on on 2x1 processors, one on 4x2 processors.
 
-Defensive programming and testing for failures
-----------------------------------------------
+    $ diff -q data/2x1.dat data/data4x2.dat
 
-http://apawlik.github.io/2014-04-09-GARNET/novice/python/05-defensive.html
-"defensive programming"
+    import numpy as np
 
-        try:
-            for ch in sequence:
-                weight += NUCLEOTIDES[ch]
-            return weight
-        except TypeError:
-            print 'The input is not a sequence e.g. a string or list'
+    def test_data_files_equal():
+      file21 = np.loadtxt("data/data2x1.dat")
+      file42 = np.loadtxt("data/data4x2.dat")
+      np.testing.assert_equal(file21, file42)
 
-Now, the exception is *caught* by the `except` block. This is a *runtime test*. It alerts the user to exceptional behavior in the code. Often, exceptions are related to functions that depend on input that is unknown at compile time. Such tests make our code robust and allows our code to behave gracefully - they anticipate problematic values and handle them.
-Often, we want to pass such errors to other points in our program rather than just print a message and continue. So, for example we could do,
-    except TypeError:
-        raise ValueError('The input is not a sequence e.g. a string or list')
-which raises a new exception, with a more meaningful message. If writing a complex application, our user interface could then present this to the user e.g. as a dialog box.
+Replace:
 
+      np.testing.assert_allclose(file21, file42, rtol=0, atol=1e-7)
 
-    try:
-        calculate_weight(123) 
-        assert False
-    except ValueError:
-        assert True
-
-This is like catching a runtime error. If an exception is raised then our test passes (`assert True`), else if no exception is raised, it fails. Alternatively, we can use `assert_raises` from `nose.tools`,
-
-    from nose.tools import assert_raises
-
-    def test_123():
-        assert_raises(ValueError, calculate_weight, 123)
-
-The assert fails if the named exception is *not* raised.
-
-
-
-
-
-
-
-
-
-Floating point pains
---------------------
-
-Back to our end to end
-
-Add in %age total of words
-
-Add in numpy-based end-to-end tests and fudge factors
- import numpy as np
- expected = np.loadtxt("expected_data.csv", delimiter=",")
- actual = np.loadtxt("output_data.csv", delimiter=",")
- assert expected.shape == actual.shape
- assert np.allclose(actual, expected, 0.001)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Add in an end to end-called in-code test
-----------------------------------------
-
-What if tests not function based?
-Redesign
-Capture inputs and outputs e.g. FABBER
-
-
+What is a suitable threshold for equality? That is application-specific - for some domains we might be happy to round to the nearest whole number, for others we may want to be far, far more accurate.
 
 Automated testing jobs
 ----------------------
@@ -561,6 +543,8 @@ When to test:
 * Early. Don't wait till after the code's been used to generate data for an important paper, or been given to someone else.
 * Often. So any bugs can be identified a.s.a.p. Bugs are easier to fix if they're identified at the time the relevant code is being actively developed.
 
+Turn bugs into assertions or tests. Check that bugs do not reappear.
+
 When to finish writing tests:
 
 * "It is nearly impossible to test software at the level of 100 percent of its logic paths", fact 32 in R. L. Glass (2002) [Facts and Fallacies of Software Engineering](http://www.amazon.com/Facts-Fallacies-Software-Engineering-Robert/dp/0321117425) ([PDF](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.94.2037&rep=rep1&type=pdf)).
@@ -576,269 +560,3 @@ Testing:
 Remember [Geoffrey Chang](http://en.wikipedia.org/wiki/Geoffrey_Chang)
 
 "If it's not tested, it's broken" - Bruce Eckel, in [Thinking in Java, 3rd Edition](http://www.mindview.net/Books/TIJ/).
-
-
-
-
-
-
-
-
-RESOURCES
----------
-
-Suite for automating testing of the out of scientific codes (with custom tolerances, etc.).
-http://www.cmth.ph.ic.ac.uk/people/j.spencer/code/docs/testcode/
-Already used in CASTEP, one of the most widely used DFT codes in the UK and Europe.
-
-http://maori.geek.nz/post/testing_your_code_is_doing_science
-http://www.rbcs-us.com/documents/Why-Most-Unit-Testing-is-Waste.pdf
-http://swcarpentry.github.io/2014-01-18-ucb/lessons/jk-python/testing.html
-
-Python package uncertainties
-"handles calculations with numbers with uncertainties"
-version 2.4.2 is compatible with NumPy 1.8
-https://pypi.python.org/pypi/uncertainties/
-http://pythonhosted.org/uncertainties/
-
-
-
-
-
-
-
-## When 1 + 1 = 2.0000001
-
-    $ python
-    >>> tot = 0.0
-    >>> for i in range(1,100):
-    >>>...  tot = tot + 0.01 # Expect answer to be 1.0
-    >>>...
-    >>> print tot
-    >>> 0.99
-
-Computers don't do floating point arithmetic too well. This can make simple tests for the equality of two floating point values problematic due to imprecision in the values being compared. 
-
-    $ python
-    >>> expected = 0
-    >>> actual = 0.1 + 0.1 + 0.1 - 0.3
-    >>> assert expected == actual
-    >>> print actual
-
-We can get round this by comparing to within a given threshold, or delta, for example we may consider *expected* and *actual* to be equal if *expected - actual < 0.000000000001*.
-
-Test frameworks such as `nose`, often provide functions to handle this for us. For example, to test that 2 numbers are equal when rounded to a given number of decimal places,
-
-    $ python
-    >>> from nose.tools import assert_almost_equal
-    >>> assert_almost_equal(expected, actual, 0)
-    >>> assert_almost_equal(expected, actual, 1)
-    >>> assert_almost_equal(expected, actual, 3)
-    >>> assert_almost_equal(expected, actual, 6)
-    >>> assert_almost_equal(expected, actual, 7)
-    ...
-    AssertionError: 2 != 2.0000000999999998 within 7 places
-
-Python [decimal](http://docs.python.org/2/library/decimal.html), floating-point arithmetic functions.
-
-    $ python
-    >>> from nose.tools import assert_almost_equal
-    >>> assert_almost_equal(expected, actual, 0)
-    >>> assert_almost_equal(expected, actual, 10)
-    >>> assert_almost_equal(expected, actual, 15)
-    >>> assert_almost_equal(expected, actual, 16)
-
-`nose.testing` uses absolute tolerance: abs(x, y) <= delta
-
-[Numpy](http://www.numpy.org/)'s `numpy.testing` uses relative tolerance: abs(x, y) <= delta * (max(abs(x), abs(y)). 
-
-    `assert_allclose(actual_array, expected_array, relative_tolerance, absolute_tolerance)
-
-What do we consider to be a suitable threshold for equality? That is application-specific - for some domains we might be happy to round to the nearest whole number, for others we may want to be far, far more accurate.
-
-
-Note that we assume that we are running the script from `ipython`. Each "." represents a test that has passed. A test can:
-
-* Pass, indicated by a `.`
-* Fail, indicated by an `F`
-* Terminate with an Error, indicated by an `E`, that is something went wrong like your code through a segmentation fault.
-
-%run TestHarness.py -v
-%run TestHarness.py -v MyTests.test2
-Can add code that will run before and after every test:
-    def setUp(self):
-        print "\nRunning test: ",self.id(),"\n"
-    def tearDown(self):
-        print "Ending test: ",self.id(),"\n"
-So that execution would now look like:
-%run TestHarness.py
-Running test:  __main__.MyTests.test1
-Ending test:  __main__.MyTests.test1
-Running test:  __main__.MyTests.test2
-Ending test:  __main__.MyTests.test2
-This can be useful set up the *fixtures* for your tests or you could
-use it to time each test:
-
-import time
-logfile ="timings.txt"
-class MyTests(unittest.TestCase):
-    def setUp(self):
-        fh = open(logfile,"a")
-        self.startTime = time.time()
-        fh.write("Test %s.\n" % (self.id()))
-        fh.close()
-    # Run after every test.
-    def tearDown(self):
-        fh = open(logfile,"a")
-        t  = time.time() - self.startTime
-        fh.write("Time to run test: %.3f seconds.\n" % (t))
-        fh.close()
-Writing to a file so as not to pollute the output. The `unittest` module comes with a number of different ways that you can check that your code is working ok, for instance:
-* `assertEqual(a,b)` checks that `a == b`.
-* `assertNotEqual(a,b)` checks that `a != b`.
-* `assertTrue(x)` checks that `x`, a boolean, is `True`.
-* `assertFalse(x)` checks that x, a boolean, is `False`.
-* `assertRaises(exc,fun,*args,**kwds)` checks that `fun(*args,**kwds)` raises exception `exc`.
-* `assertAlmostEqual(a,b)` checks that `round(a-b,7) == 0`
-* `assertNotAlmostEqual(a,b)` checks that `round(a-b,7)!=0`
-def MySum(a,b)
-    if(type(a) == str or type(b) == str):
-       raise TypeError("Can only have integers or floats")
-    return(a+b)
-We can also add a test to ensure that an exception is being raised:
-    from MyFunctions import MyRepeatedSum
-    def testMySumExceptionArg1(self):
-        self.assertRaises(TypeError,MySum,1,"a")
-    def testMySumExceptionArg2(self):
-        self.assertRaises(TypeError,MySum,"a",2)
-def MyRepeatedSum(num,repeat):
-    Sums num a number of times specified by repeat.
-    tot = 0
-    for i in range(repeat):
-        tot += num
-    return tot
-Now lets import that into our test routine and do a couple of new tests:
-    def testMyRepeatedSum1(self):
-        self.assertEqual(MyRepeatedSum(1,100),100)
-    def testMyRepeatedSum2(self):
-        self.assertEqual(MyRepeatedSum(0.1,100),10.0)
-When we run this we can see that we have a test failure:
-======================================================================
-FAIL: testMyRepeatedSum2 (__main__.MyTests)
-----------------------------------------------------------------------
-Traceback (most recent call last):
-  File "TestHarness.py", line 26, in testMyRepeatedSum2
-    self.assertEqual(MyRepeatedSum(0.1,100),10.0)
-AssertionError: 9.99999999999998 != 10.0
-Ran 6 tests in 0.002s
-FAILED (failures=1)
-We have our first test failure. You should ***never*** test for equality (`==`) or inequality (`!=`) with floating numbers due to round off errors (amongst other things). We should instead use:
-    def testMyRepeatedSum2(self):
-         NumDecPlaces = 3 # default is 7
-        self.assertAlmostEqual(MyRepeatedSum(0.1,100),10.0,NumDecPlaces)
-Now all tests should pass:
-import unittest
-class TestLTKV(unittest.TestCase):
-    def test1(self):
-        pass
-if __name__ == '__main__':
-   unittest.main()
-Now, we want to specify:
-* What the script we are running is called
-* What config file is called
-* What the output files is going to be called
-* What the reference file we are comparing this against is going to be called
-* We want a function that will run the script to generate the output
-* We want a test function that will compare the two files and return `True` if the two files are the same
-So the test, essentially becomes:
-
-
-diff Test1Output.csv outputT1.csv
-2c2
-< # Produced by simulate_lv.py on Mon Dec 02 15:32:34 2013
----
-> # Produced by simulate_lv.py on Mon Dec 02 17:23:51 2013
-```
-
-The temptation here is to go back into the script and comment out the line that is producing the comment however this is not good practice as having that kind of provenance in your data can prove invaluable. We will just have to work a little harder in our comparison function.
-
-Basically we want to look at a line by line comparison but ignore the remaining parts of any lines that have a `#` in them. Let's try a new version. What we want is:
-
-```
-def compareFiles(file1, file2):
-    # Read the contents of each file.
-    # Check we have the same number of lines
-      # If not return False
-    # Iterate over the lines
-      # Strip out any content that begins with a hash
-      # Compare lines
-      # If different return False
-    # Return true
-```
-
-Now all we have to do is fill in the code. This gives us:
-
-```
-def compareFiles(file1,file2):
-
-    # open each file and read in the lines
-    f1 = open(file1,"r")
-    lines1 = f1.readlines()
-    f1.close()
-    f2 = open(file2,"r")
-    lines2 = f2.readlines()
-    f2.close()
-
-    # Check we have the same number of lines else the
-    # files are not the same.
-    if(len(lines1) != len(lines2)):
-       print "File does not have the same number of lines.\n"
-       return(False)
-
-    # Now iterate over the lines
-    for i in range(len(lines1)):
-
-        # This splits the string on a '#' character, then keeps
-        # everything before the split. The 1 argument makes the .split()
-        # method stop after a one split; since we are just grabbing the
-        # 0th substring (by indexing with [0]) you would get the same 
-        # answer without the 1 argument, but this might be a little bit 
-        # faster. From steveha at http://tinyurl.com/noyk727
-
-        lines1[i] = lines1[i].split("#",1)[0]
-        line1     = lines1[i].rsplit()
-
-        lines2[i] = lines2[i].split("#",1)[0]
-        line2     = lines2[i].rsplit()
-
-        if(line1 != line2):
-           print "Line ",i+1," not the same\n",file1,":",line1,"\n",file2,
-           print ": ",line2,"\n"
-           return False
-
-    # Got through to here so it appears all lines are the same.
-    return True
-```
-
-If we use this routine we now find that our test passes:
-
-```
-python TestLTKV.py
-.
-----------------------------------------------------------------------
-Ran 1 test in 0.610s
-
-OK
-```
-
-But now we have a paradigm that we can use for multiple different number
-of configuration files and output files. 
-
-Now time for you to try and write some tests. You could try to ensure
-that if the initial conditions for the prey is set to zero, the predator
-numbers will decay to zero or try testing some other feature of the trial
-scripts. You will find that you will deepen your understanding of the code
-by doing these tests.
-
-In essence too you will see  that you can use Python as a test harness for non-Python codes as well - in this case we used a Python script but you could have based it on a C or Fortran executable. In that case though you may have to 
-look at individual elements, element by element if you are using floating point values.

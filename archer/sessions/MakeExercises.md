@@ -30,18 +30,6 @@ Replace occurrences of `wordcount.py` with the macro-name,
 Exercise 4 - add another processing stage
 -----------------------------------------
 
-`plotcount.py` contains a Python script that plots data in the
-two-column `.dat` files e.g.
-
-    python plotcount.py -show war.dat
-    python plotcount.py -show kim.dat
-    python plotcount.py -show bridge.dat
-
-If given a `-save` flag and another file name it can save the plot
-as a `.jpg` e.g.
-
-    python plotcount.py -save war.dat war.jpg
-
 Extend the Makefile:
 
 * Add a rule to create `.jpg` files from `.dat` files, using wild-cards.

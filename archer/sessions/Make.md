@@ -50,18 +50,45 @@ Example:
 * Python script to read text files output words and their frequencies.
 * It doesn't really matter which programs we are using, could be anything.
 
+A simple data processing pipeline
+---------------------------------
+
+Count the words in a text file:
+
+    $ python wordcount.py war.txt war.dat
+    $ head war.dat
+
+Count the words in a text file over a certain length:
+
+    $ python wordcount.py war.txt war.dat 12
+    $ head war.dat
+
+Plot the first 10 word counts in a data file:
+
+    $ python plotcount.py war.dat show
+
+Plot the first N word counts in a data file:
+
+    $ python plotcount.py war.dat show N
+
+Plot the first 10 word counts in a data file and save:
+
+    $ python plotcount.py war.dat war.jpg
+    $ python plotcount.py war.dat war5.jpg 5
+
+
 A first makefile
 ----------------
 
 Type command manually:
 
-    python wordcount.py war.txt war.dat
-    head war.dat
+    $ python wordcount.py war.txt war.dat
+    $ head war.dat
 
 Shell script. But:
 
-    touch war.txt
-    ls -l war.txt war.dat
+    $ touch war.txt
+    $ ls -l war.txt war.dat
 
 `war.dat` is now older than `war.txt` - 'out-of-date' - so needs to be updated.
 
@@ -84,13 +111,13 @@ Makefile format:
 
 Run:
 
-    make
+    $ make
 
 `-f` can name a specific makefile. If omitted, then a default of `Makefile` is assumed.
 
 Make uses 'last modification time' to determine if dependencies are newer than targets.
 
-    make
+    $ make
 
 Question: why did nothing happen?
 
@@ -103,12 +130,12 @@ Add a rule:
 
 `touch` updates a file's time-stamp which makes it look as if it's been modified.
 
-    touch jekyll.txt
-    make
+    $ touch jekyll.txt
+    $ make
 
 Nothing happens to `jekyll.dat` as the first rule in the makefile, the default rule, is used.
 
-    make jekyll.dat
+    $ make jekyll.dat
 
 Introduce a phony target:
 
@@ -117,9 +144,9 @@ Introduce a phony target:
 
 `all` is not a 'thing' - a file or directory - but depends on 'things' that are, and so can be used to trigger their rebuilding.
 
-    make all
-    touch war.txt jekyll.txt
-    make all
+    $ make all
+    $ touch war.txt jekyll.txt
+    $ make all
 
 Order of rebuilding dependencies is arbitrary.
 
@@ -158,7 +185,7 @@ Add:
 
 Run:
 
-    make analysis.tar.gz
+    $ make analysis.tar.gz
 
 Duplication and repeated code creates maintainability issues. Makefiles are a type of code.
 
@@ -176,16 +203,16 @@ Rewrite action:
 
 Bash wild-card can be used in file names. Replace dependencies with:
 
-    analysis.tar.gz : *..dat
+    analysis.tar.gz : *.dat
 
-    make analysis.tar.gz
-    touch *.dat
-    make analysis.tar.gz
+    $ make analysis.tar.gz
+    $ touch *.dat
+    $ make analysis.tar.gz
 
 But watch what happens:
 
-    rm *.dat
-    make analysis.tar.gz
+    $ rm *.dat
+    $ make analysis.tar.gz
 
 Question: any guesses as to why this is?
 
@@ -193,7 +220,7 @@ Answer: there are no files that match `*.dat` so the name `*.dat` is used as-is.
 
 Create `.data` files in a more manual way:
 
-    make war.dat jekyll.dat bridge.dat
+    $ make war.dat jekyll.dat bridge.dat
 
 Dependencies on data and code
 -----------------------------
@@ -209,8 +236,8 @@ Output data is not just dependent upon input data but also programs that create 
 
 `.txt` files are input files and have no dependencies. To make these depend on `python.py` would introduce a 'false dependency'.
 
-    touch wordcount.py
-    make all
+    $ touch wordcount.py
+    $ make all
 
 Pattern rules
 -------------
@@ -290,8 +317,8 @@ What make will do
 
 If unsure of what make would do:
 
-    touch *.txt
-    make -n analysis.tar.gz
+    $ touch *.txt
+    $ make -n analysis.tar.gz
 
 Displays commands that make would run.
 
@@ -300,20 +327,13 @@ Exercise 4 - add another processing stage
 
 See [exercises](MakeExercises.md).
 
-Completed makefile and configuration file
------------------------------------------
+Solution:
 
 Makefile, `Makefile`:
 
-    include config.mk
-
-    # Calculate word frequencies.
-    %.dat : %.txt $(PROCESSOR)
-        python $(PROCESSOR) $< $@
-
     # Calculate images
     %.jpg : %.dat $(PLOTTER)
-        python $(PLOTTER) -save $< $@
+        python $(PLOTTER) $< $@
 
     analysis.tar.gz : *.dat *.jpg $(PROCESSOR)
         tar -czf $@ $^
@@ -325,8 +345,6 @@ Makefile, `Makefile`:
 
 Configuration file, `config.mk`:
 
-    # Word frequency calculations.
-    PROCESSOR=wordcount.py
     # Image output calculations
     PLOTTER=plotcount.py
 
@@ -347,17 +365,20 @@ Conclusion
 
 See [the purpose of Make](MakePurpose.png).
 
+Make:
 * Automates repetitive tasks
 * Reduces errors
 * Frees up time to do research
-* Documents:
- * How your software is built
- * How your data is created
- * How your reports are formed
- * Dependencies between your analysis programs, input and configuration data, and output data
-* Build files are programs
- * Use meaningful variable names
- * Provide useful comments
- * Separate configuration from computation
- * Keep under revision control
- * Treat them with same respect you give any program
+
+Documents:
+* How your software is built
+* How your data is created
+* How your reports are formed
+* Dependencies between your analysis programs, input and configuration data, and output data
+
+Build files are programs
+* Use meaningful variable names
+* Provide useful comments
+* Separate configuration from computation
+* Keep under revision control
+* Treat them with same respect you give any program

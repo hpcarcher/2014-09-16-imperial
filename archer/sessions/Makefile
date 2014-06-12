@@ -16,7 +16,7 @@ jpgs : $(JPG_FILES)
 
 # Calculate images
 %.jpg : %.dat $(PLOTTER)
-	python $(PLOTTER) -save $< $@
+	python $(PLOTTER) $< $@
 
 analysis.tar.gz : *.dat *.jpg $(PROCESSOR)
 	tar -czf $@ $^
