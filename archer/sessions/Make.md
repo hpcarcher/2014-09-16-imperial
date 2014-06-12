@@ -318,6 +318,11 @@ Makefile, `Makefile`:
     analysis.tar.gz : *.dat *.jpg $(PROCESSOR)
         tar -czf $@ $^
 
+    clean : 
+        rm -f analysis.tar.gz
+        rm -f *.dat
+        rm -f *.jpg
+
 Configuration file, `config.mk`:
 
     # Word frequency calculations.

@@ -20,3 +20,8 @@ jpgs : $(JPG_FILES)
 
 analysis.tar.gz : *.dat *.jpg $(PROCESSOR)
 	tar -czf $@ $^
+
+clean : 
+	rm -f *.dat
+	rm -f *.jpg
+        rm -f analysis.tar.gz

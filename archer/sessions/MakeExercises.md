@@ -47,3 +47,4 @@ Extend the Makefile:
 * Add a rule to create `.jpg` files from `.dat` files, using wild-cards.
 * Modify the `analysis.tar.gz` rule to add the `.jpg` files to the `.gz` file.
 * Use a macro to hold the script name `plotcount.py`.
+* Add a `clean` rule to remove `.jpg` and `.dat` files  and `analysis.tar.gz`.
