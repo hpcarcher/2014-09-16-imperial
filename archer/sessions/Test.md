@@ -95,7 +95,7 @@ Create `test_word_count.sh`:
 
     rm -f *.dat
     echo "Test 1"
-    python wordcount.py abyss.txt abyss.dat
+    python wordcount.py books/abyss.txt abyss.dat
     test_file_exists abyss.dat
 
 Use shell functions as these commands will be called more than once. Think ahead. Plan for reuse.
@@ -108,7 +108,7 @@ Run:
 Extend:
 
     echo "Test 2"
-    python wordcount.py war.txt war.dat
+    python wordcount.py books/war.txt war.dat
     test_file_exists war.dat
 
 Run:
@@ -143,22 +143,22 @@ Check actual outputs against expected outputs
 
 Create expected outputs:
 
-    $ python wordcount.py abyss.txt abyss.dat
-    $ python wordcount.py bridge.txt bridge.dat
-    $ python wordcount.py kim.txt kim.dat
-    $ python wordcount.py war.txt war.dat
+    $ python wordcount.py books/abyss.txt abyss.dat
+    $ python wordcount.py books/bridge.txt bridge.dat
+    $ python wordcount.py books/kim.txt kim.dat
+    $ python wordcount.py books/war.txt war.dat
     $ mkdir expected/
     $ mv *.dat expected/
 
 `diff` compares files for equality:
 
-    $ python wordcount.py abyss.txt  > abyss.dat
+    $ python wordcount.py books/abyss.txt  > abyss.dat
     $ diff abyss.dat expected/abyss.dat
 
 `$?` holds the exit code of the command, `0` for OK, and non-zero for errors:
 
     $ echo $?
-    $ diff abyss.txt kim.txt
+    $ diff books/abyss.txt books/kim.txt
     $ echo $?
 
 Extend tests to check actual outputs against expected outputs:
@@ -175,7 +175,7 @@ Extend tests to check actual outputs against expected outputs:
     }
 
     echo "Test 4"
-    python wordcount.py abyss.txt abyss.dat
+    python wordcount.py books/abyss.txt abyss.dat
     test_files_equal abyss.dat expected/abyss.dat
 
     $ ./test_word_count.sh
@@ -194,7 +194,7 @@ Restore:
 
 Hard-coding the sample file names can be problematic. Automate:
 
-    for file in $(ls *.txt); do
+    for file in $(ls books/*.txt); do
       name=`basename $file .txt`
       output_file=$name.dat
       echo "Test - $file"
@@ -253,7 +253,7 @@ Add meta-data to the output file to record the provenance of the data file.
 
 Run:
 
-    $ python wordcount.py abyss.txt abyss.dat
+    $ python wordcount.py books/abyss.txt abyss.dat
     $ head abyss.dat
 
 Run:
