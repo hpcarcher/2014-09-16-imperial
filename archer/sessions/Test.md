@@ -72,97 +72,153 @@ Examples:
 
 Will use as a research code `wordcount.py` which takes in a text file and outputs a data file with words and their frequencies.
 
-Shell-based testing
--------------------
+End-to-end tests and the shell
+------------------------------
 
-`diff` compares files for equality.
+Question: what is possibly the simplest test we could do? `wordcount.py` reads an input file and writes an output file.
 
-    $ diff abyss.txt kim.txt
-
-    $ mkdir data/
-    $ cp *.txt data
-    $ python wordcount.py abyss.txt  > abyss.dat
-    $ python wordcount.py bridge.txt  > bridge.dat
-    $ python wordcount.py kim.txt  > kim.dat
-    $ python wordcount.py war.txt  > war.dat
-    $ mkdir expected/
-    $ mv *.dat expected/
+Answer: check there is an output file produced for a valid input file.
 
 Create `test_word_count.sh`:
 
     #!/bin/sh
-    rm -rf tmpdats
-    mkdir tmpdats
+
+    # $1 File to check existence for.
+    test_file_exists() {
+      if [ -f "$1" ]
+      then
+        echo "OK: $1 exists"
+      else
+        echo "FAILURE: $1 not found"
+      fi
+    }
+
+    rm -f *.dat
     echo "Test 1"
-    python wordcount.py data/abyss.txt > tmpdats/abyss.dat
-    diff -rq expected/abyss.dat tmpdats/abyss.dat
+    python wordcount.py abyss.txt abyss.dat
+    test_file_exists abyss.dat
+
+Use shell functions as these commands will be called more than once. Think ahead. Plan for reuse.
+
+Run:
 
     $ chmod +x test_word_count.sh
-    $ ./test_word_count.sh
+    $ ./test_word_count,sh
 
-Exercise 1 - add more tests
----------------------------
+Extend:
+
+    echo "Test 2"
+    python wordcount.py war.txt war.dat
+    test_file_exists war.dat
+
+Run:
+
+    $ ./test_word_count,sh
+
+Another simple test is for failure, that there is no output file if there is an invalid, or no, input file.
+
+Exercise 1 - write a test for no file
+-------------------------------------
 
 See [exercises](TestExercises.md).
 
 Solution:
 
-    echo "Test 2"
-    python wordcount.py data/bridge.txt > tmpdats/bridge.dat
-    diff -rq expected/bridge.dat tmpdats/bridge.dat
-    echo "Test 3"
-    python wordcount.py data/war.txt > tmpdats/war.dat
-    diff -rq expected/war.dat tmpdats/war.dat
-
-Refactor
---------
-
-Remove repeated code and modularise into reusable functions.
-
-    # $1 input data file
-    # $2 output data file
-    # $3 expected data file
-    test_wordcount() {
-      python wordcount.py $1 > $2
-      check_outputs $3 $2
-    }
-
-    # $1 file to compare
-    # $2 file to compare
-    check_outputs() {
-      compare=`diff -rq $1 $2`
-      if [ -z "$compare" ]; then
-        echo "."
+    # $1 File to check non-existence for.
+    test_file_not_exists() {
+      if [ -f "$1" ]
+      then
+        echo "FAILURE: $1 exists"
       else
-        echo "FAILURE: $compare"
+        echo "OK: $1 not found"
       fi
     }
 
-    rm -rf tmptests
-    mkdir tmptests
+    echo "Test 3"
+    python wordcount.py no_such_file.txt none.dat
+    test_file_not_exists none.dat
 
-    for file in $(ls data/*.txt); do
-      filename=`basename $file .txt`
-      test_wordcount $file tmptests/$filename.dat expected/$filename.dat
+Check actual outputs against expected outputs
+---------------------------------------------
+
+Create expected outputs:
+
+    $ python wordcount.py abyss.txt abyss.dat
+    $ python wordcount.py bridge.txt bridge.dat
+    $ python wordcount.py kim.txt kim.dat
+    $ python wordcount.py war.txt war.dat
+    $ mkdir expected/
+    $ mv *.dat expected/
+
+`diff` compares files for equality:
+
+    $ python wordcount.py abyss.txt  > abyss.dat
+    $ diff abyss.dat expected/abyss.dat
+
+`$?` holds the exit code of the command, `0` for OK, and non-zero for errors:
+
+    $ echo $?
+    $ diff abyss.txt kim.txt
+    $ echo $?
+
+Extend tests to check actual outputs against expected outputs:
+
+    # $1 file to compare
+    # $2 file to compare
+    test_files_equal() {
+      compare=`diff -rq $1 $2`
+      if [ -z "$compare" ]; then
+        echo "OK: $1 equals $2"
+      else
+        echo "FAILURE: $1 does not equal $2"
+      fi
+    }
+
+    echo "Test 4"
+    python wordcount.py abyss.txt abyss.dat
+    test_files_equal abyss.dat expected/abyss.dat
+
+    $ ./test_word_count.sh
+
+Check no cheating:
+
+    test_files_equal abyss.dat expected/kim.dat
+
+    $ ./test_word_count.sh
+
+Restore:
+
+    test_files_equal abyss.dat expected/abyss.dat
+
+    $ ./test_word_count.sh
+
+Hard-coding the sample file names can be problematic. Automate:
+
+    for file in $(ls *.txt); do
+      name=`basename $file .txt`
+      output_file=$name.dat
+      echo "Test - $file"
+      python wordcount.py $file $output_file
+      test_file_exists $output_file
+      test_files_equal $output_file expected/$output_file
     done
 
-Test for failures
------------------
-
-Test for return code. Expect non-zero return code if script fails:
-
-    python wordcount.py
-    EXIT=$? # Capture exit code.
-    if [ $EXIT -ne 0 ]; then
-        echo "."
-    else
-        echo "FAILURE: exit code should be non-zero"
-    fi
+    $ ./test_word_count.sh
 
 Exercise 2 - recode `wordcount.py`
 ----------------------------------
 
 See [exercises](TestExercises.md).
+
+Solution:
+
+    DELIMITERS=".,;:?$@^<>#%`!*-=()[]{}/\"\'"
+    TRANSLATE_TABLE = string.maketrans(DELIMITERS, len(DELIMITERS) * " ")
+
+    def add_frequencies(line, frequencies, min_length = DEFAULT_MIN_LENGTH):
+      line = string.translate(line, TRANSLATE_TABLE) 
+      words = line.split()
+      ...
 
 Test structure
 --------------
@@ -185,49 +241,124 @@ This includes:
 Data file meta-data
 -------------------
 
-Add meta-data to the output:
+Add meta-data to the output file to record the provenance of the data file. 
 
     import datetime
 
-    print "# Frequency data"
-    print "# Created by:",  __file__
-    print "# Input data:", file
-    print "# Date:", today
-    print "# Format: word frequency"
+    f.write("# Frequency data\n")
+    f.write("# Created by: %s\n" % __file__)
+    f.write("# Input data: %s\n" % file)
+    f.write("# Date: %s\n" % datetime.datetime.today())
+    f.write("# Format: word frequency\n")
 
 Run:
 
-    ./test-word-count.sh
+    $ python wordcount.py abyss.txt abyss.dat
+    $ head abyss.dat
+
+Run:
+
+    $ ./test_wordcount.sh
 
 Question: what is the problem?
 
-Answer: the meta-data. 
+Answer: the meta-data. `diff` is too simplistic now. 
+
+One workaround would be to use shell commands to trim off the problematic lines. This is just delaying the problem. The files may have too complex a structure for such manipulations.
+
+Write our tests in a programming language.
+
+When 0.1 + 0.2 == 3.00000000004
+-------------------------------
+
+Question: what other problems might `diff` experience with data files?
+
+Answer: floating point values.
+
+    $ python
+    > a = 0.1
+    > b = 0.2
+    > print a + b
+    > print a + b == 0.3
+    > a + b
+
+Computers don't do floating point arithmetic too well. This can make simple tests for the equality of two floating point values problematic due to imprecision in the values being compared. 
 
 Will typically want finer grained tests of equality between data files.
 
+For floating point values, compare for equality within a given threshold, or delta, for example we may consider *expected* and *actual* to be equal if *expected - actual < 0.000000000001*.
 
-TODO
-TODO
-TODO
+This applies not only for comparing data files en masse but also when testing components at any level of granularity.
+
+Testing at finer-granularities - towards unit tests
+---------------------------------------------------
+
+End-to-end automated testing is better than nothing. Ideally, though, tests at varying levels of granularity should be written.
+
+If every component has a set of tests then changes to the component can be tested before the component is integrated.
+
+It can be quicker to discover a problem when testing a 10 line function in isolation then testing it as part of an end-to-end application which may take 1 hour to run and may not even, depending upon the inputs, invoke that function. 
+
+The finest level of granularity is called a unit test, typically of individual functions, where a unit is the smallest testable part of an application. This could be a function or module, method or class.
+
+Exercise 3 - propose some tests for `wordcount.py`
+--------------------------------------------------
+
+See [exercises](TestExercises.md).
+
+Solution:
+
+Many examples exist including:
+
+`load_text(file)`
+
+* A standard file returns a list of length equal to the number of lines in the file.
+* An empty file returns an empty list.
+* A non-existent file raises an error.
+
+`add_frequencies(line, frequencies, min_length = DEFAULT_MIN_LENGTH)`
+
+* A sentence of distinct words and an empty dictionary of frequencies results in a dictionary with an entry for each word with a count of 1.
+* A zero-length sentence and an empty dictionary of frequencies results in an empty dictionary of frequencies.
+* A sentence of distinct words and a dictionary with entries for all of those words results in each count in the dictionary being increased by 1.
+* A sentence of words each less than 3 and a min_length of 4 and an empty dictionary results in an empty dictionary.
+
+`get_frequencies(lines, min_length = DEFAULT_MIN_LENGTH)`
+
+* An empty list returns an empty list of pairs.
+* Other tests as for `add_frequencies` but across a number of lines.
+
+`save_pairs(file, pairs)`
+
+* An ampty list results in an empty file.
+* A non-empty list results in a file with a number of lines equal to the number of pairs in the list.
+
+A unit test for `add_frequencies`
+---------------------------------
+
+Create `test_wordcount.py`:
+
+    from wordcount import add_frequencies
+
+    def test_add_frequencies():
 
 
 
-Programming tests
------------------
+What is:
 
-Shell problems:
-* diff
-* return code
-* granularity is coarse
-* Prechelt and language.
+    from nose.tools import assert_equal
 
 
-WRITE FILE VALIDATOR IN PYTHON!!!!!
 
 
-Add more information to the failure messages by providing additional string arguments e.g.
+import unittests
+class MyTests(unittest.TestCase):
+if __name__ == '__main__':
+    unittest.main()
+A test case is defined by subclassing `unittest.TestCase`. We have defined two rather uninteresting tests. If we run this we get:
+TestHarness.py
 
-    >>> assert_true("GTA" in actual, "Expected value was not in the output list")
+
 
 nosetests
 ---------
@@ -276,31 +407,34 @@ End to end is fine!
 Same applies to others
 
 CAN FLOATING POINT BE DONE HERE
+    >>> assert_true("GTA" in actual, "Expected value was not in the output list")
 
 
 
-Add in an end to end-called in-code test
-----------------------------------------
-
-What if tests not function based?
-Redesign
-Capture inputs and outputs e.g. FABBER
-
-finer grained tests
-----------
-
-But can drill in as code is Python and tests in Python
 
 
-Write unit test for freq
 
-    def test_encode_sos(self):
-        expected = "... --- ..."
-        actual = self.translator.encode("SOS")                     
-        assert expected == actual
 
-Defensive programming
----------------------
+
+
+
+
+
+Exercise 4 - write more unit tests for `wordcount.py`
+-----------------------------------------------------
+
+See [exercises](TestExercises.md).
+
+Allow 15 minutes or so.
+
+
+
+
+
+
+
+Defensive programming and testing for failures
+----------------------------------------------
 
 http://apawlik.github.io/2014-04-09-GARNET/novice/python/05-defensive.html
 "defensive programming"
@@ -318,8 +452,6 @@ Often, we want to pass such errors to other points in our program rather than ju
         raise ValueError('The input is not a sequence e.g. a string or list')
 which raises a new exception, with a more meaningful message. If writing a complex application, our user interface could then present this to the user e.g. as a dialog box.
 
-Testing for failures and robustness
------------------------------------
 
     try:
         calculate_weight(123) 
@@ -336,6 +468,14 @@ This is like catching a runtime error. If an exception is raised then our test p
 
 The assert fails if the named exception is *not* raised.
 
+
+
+
+
+
+
+
+
 Floating point pains
 --------------------
 
@@ -350,17 +490,44 @@ Add in numpy-based end-to-end tests and fudge factors
  assert expected.shape == actual.shape
  assert np.allclose(actual, expected, 0.001)
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Add in an end to end-called in-code test
+----------------------------------------
+
+What if tests not function based?
+Redesign
+Capture inputs and outputs e.g. FABBER
+
+
+
 Automated testing jobs
 ----------------------
 
-Link to revision control
+Automated tests can be run:
 
-The [Muon Ion Cooling Experiment](http://www.mice.iit.edu/) (MICE) have a large number of tests written in Python. They use [Jenkins](), a *continuous integration server* to build their code and trigger the running of the tests which are then [published online](https://micewww.pp.rl.ac.uk/tab/show/maus).
-Continuous integration server e.g. [Jenkins](http://jenkins-ci.org/) - detect commit to version control, build, run tests, publish.
+* Manually.
+* At regular intervals.
+* Every time code is commited to revision control.
 
-[Muon Ion Cooling Experiment](http://www.mice.iit.edu/) (MICE) - Bazaar version control, Python tests, Jenkins, [published online](https://micewww.pp.rl.ac.uk/tab/show/maus).
+A simple automatic triggering of automated tests is via a Unix `cron` job.
 
-[Apache Hadoop Common Jenkins dashboard](https://builds.apache.org/job/Hadoop-Common-trunk/)
+A more advanced approach is via a continuous integration server. These trigger automated test runs and publish the results.
+
+* [Muon Ion Cooling Experiment](http://www.mice.iit.edu/) (MICE) have a large number of tests written in Python. They use [Jenkins]() to build their code and trigger the running of the tests which are then [published online](https://micewww.pp.rl.ac.uk/tab/show/maus).
+* [Apache Hadoop Common Jenkins dashboard](https://builds.apache.org/job/Hadoop-Common-trunk/)
 
 Tests are code
 --------------
@@ -373,7 +540,7 @@ Avoid tests that:
 * Fail when they should pass, false negatives.
 * Don't test anything. 
 
-For example,
+An example inspired by real-life:
 
     def test_critical_correctness():
         # TODO - will complete this tomorrow!
@@ -410,6 +577,13 @@ Remember [Geoffrey Chang](http://en.wikipedia.org/wiki/Geoffrey_Chang)
 
 "If it's not tested, it's broken" - Bruce Eckel, in [Thinking in Java, 3rd Edition](http://www.mindview.net/Books/TIJ/).
 
+
+
+
+
+
+
+
 RESOURCES
 ---------
 
@@ -417,7 +591,6 @@ Suite for automating testing of the out of scientific codes (with custom toleran
 http://www.cmth.ph.ic.ac.uk/people/j.spencer/code/docs/testcode/
 Already used in CASTEP, one of the most widely used DFT codes in the UK and Europe.
 
-https://code.google.com/p/shunit2/ 
 http://maori.geek.nz/post/testing_your_code_is_doing_science
 http://www.rbcs-us.com/documents/Why-Most-Unit-Testing-is-Waste.pdf
 http://swcarpentry.github.io/2014-01-18-ucb/lessons/jk-python/testing.html
@@ -483,44 +656,6 @@ Python [decimal](http://docs.python.org/2/library/decimal.html), floating-point 
 
 What do we consider to be a suitable threshold for equality? That is application-specific - for some domains we might be happy to round to the nearest whole number, for others we may want to be far, far more accurate.
 
-## Structure
-
-Fixture: what the test is run on
-Action: what we do to the fixture
-Expected result: result that should happen
-Actual result: what actually happen
-Report: summary
-
-## Let's start writing a python test harness
-
-Going to use the `unittest` framework. This has been in python since python 2.6. Create a `TestHarness.py` file and type in the following:
-
-```
-import unittests
-
-class MyTests(unittest.TestCase):
-
-    def test1(self):
-        pass
-
-    def test2(self):
-        pass
-
-if __name__ == '__main__':
-
-   unittest.main()
-```
-
-A test case is defined by subclassing `unittest.TestCase`. We have defined two rather uninteresting tests. If we run this we get:
-
-```
-%run TestHarness.py
-..
-----------------------------------------------------------------------
-Ran 2 tests in 0.002s
-
-OK
-```
 
 Note that we assume that we are running the script from `ipython`. Each "." represents a test that has passed. A test can:
 
@@ -528,81 +663,37 @@ Note that we assume that we are running the script from `ipython`. Each "." repr
 * Fail, indicated by an `F`
 * Terminate with an Error, indicated by an `E`, that is something went wrong like your code through a segmentation fault.
 
-Also if you want more detail you can run your tests using the `-v` flag then you would get:
-
-```
 %run TestHarness.py -v
-test1 (__main__.MyTests) ... ok
-test2 (__main__.MyTests) ... ok
-
-----------------------------------------------------------------------
-Ran 2 tests in 0.007s
-
-OK
-```
-Or you can run a single test if you wish:
-```
 %run TestHarness.py -v MyTests.test2
-test2 (__main__.MyTests) ... ok
-
-----------------------------------------------------------------------
-Ran 1 test in 0.004s
-
-OK
-```
 Can add code that will run before and after every test:
-```
     def setUp(self):
         print "\nRunning test: ",self.id(),"\n"
-
     def tearDown(self):
         print "Ending test: ",self.id(),"\n"
-```
 So that execution would now look like:
-```
 %run TestHarness.py
-
 Running test:  __main__.MyTests.test1
-
 Ending test:  __main__.MyTests.test1
-
-.
 Running test:  __main__.MyTests.test2
-
 Ending test:  __main__.MyTests.test2
-
-.
-----------------------------------------------------------------------
-Ran 2 tests in 0.020s
-
-OK
-```
 This can be useful set up the *fixtures* for your tests or you could
 use it to time each test:
 
-```
 import time
-
 logfile ="timings.txt"
-...
 class MyTests(unittest.TestCase):
-
     def setUp(self):
         fh = open(logfile,"a")
         self.startTime = time.time()
         fh.write("Test %s.\n" % (self.id()))
         fh.close()
-
     # Run after every test.
     def tearDown(self):
         fh = open(logfile,"a")
         t  = time.time() - self.startTime
         fh.write("Time to run test: %.3f seconds.\n" % (t))
         fh.close()
-...
-```
 Writing to a file so as not to pollute the output. The `unittest` module comes with a number of different ways that you can check that your code is working ok, for instance:
-
 * `assertEqual(a,b)` checks that `a == b`.
 * `assertNotEqual(a,b)` checks that `a != b`.
 * `assertTrue(x)` checks that `x`, a boolean, is `True`.
@@ -610,67 +701,28 @@ Writing to a file so as not to pollute the output. The `unittest` module comes w
 * `assertRaises(exc,fun,*args,**kwds)` checks that `fun(*args,**kwds)` raises exception `exc`.
 * `assertAlmostEqual(a,b)` checks that `round(a-b,7) == 0`
 * `assertNotAlmostEqual(a,b)` checks that `round(a-b,7)!=0`
-
-Let's make it a little more interesting. Create a new python file: `MyFunctions.py` and add a function:
-
-```
-def MySum(a,b):
-    return(a+b)
-```
-Now we want to import this function into our test harness. Add the line at the top of `TestHarness.py`:
-```
-from MyFunctions import MySum
-```
-We can now add a test to check this works:
-```
-    def testMySum(self):
-        self.assertEqual(MySum(1,3),4)
-```     
-That should have worked. What happens if we try the following?
-
-```
-    MySum("a","b")
-    "ab"
-```
-It may well be that that is perfectly acceptable behaviour but, on the other hand, you may only want numbers to be added and not to have string concatenation. We can change the sum function accordingly:
-```
 def MySum(a,b)
     if(type(a) == str or type(b) == str):
        raise TypeError("Can only have integers or floats")
     return(a+b)
-```
 We can also add a test to ensure that an exception is being raised:
-```
     from MyFunctions import MyRepeatedSum
-     ...
     def testMySumExceptionArg1(self):
         self.assertRaises(TypeError,MySum,1,"a")
-
     def testMySumExceptionArg2(self):
         self.assertRaises(TypeError,MySum,"a",2)
-```
-We can keep on playing these games and add further tests for `MySum` but let's define a new function:
-```
 def MyRepeatedSum(num,repeat):
-    """
     Sums num a number of times specified by repeat.
-    """
     tot = 0
     for i in range(repeat):
         tot += num
     return tot
-```
 Now lets import that into our test routine and do a couple of new tests:
-```
     def testMyRepeatedSum1(self):
         self.assertEqual(MyRepeatedSum(1,100),100)
-
     def testMyRepeatedSum2(self):
         self.assertEqual(MyRepeatedSum(0.1,100),10.0)
-```
 When we run this we can see that we have a test failure:
-```
-..F...
 ======================================================================
 FAIL: testMyRepeatedSum2 (__main__.MyTests)
 ----------------------------------------------------------------------
@@ -678,142 +730,29 @@ Traceback (most recent call last):
   File "TestHarness.py", line 26, in testMyRepeatedSum2
     self.assertEqual(MyRepeatedSum(0.1,100),10.0)
 AssertionError: 9.99999999999998 != 10.0
-
-----------------------------------------------------------------------
 Ran 6 tests in 0.002s
-
 FAILED (failures=1)
-```
 We have our first test failure. You should ***never*** test for equality (`==`) or inequality (`!=`) with floating numbers due to round off errors (amongst other things). We should instead use:
-
-```
     def testMyRepeatedSum2(self):
          NumDecPlaces = 3 # default is 7
         self.assertAlmostEqual(MyRepeatedSum(0.1,100),10.0,NumDecPlaces)
-```
 Now all tests should pass:
-```
-......
-----------------------------------------------------------------------
-Ran 6 tests in 0.002s
-
-OK
-```
-This then forms the basics of how one might go on to develop a test framework using Python. We shall come back to this later but lets have a look at `nosetests`.
-
-Start by pulling an updated version of the scripts. In the students directory you checked out from GitHub run the following commands:
-
-Will use the `unittest` framework as that can be used on its own and with unit tests. Call this script `TestLTKV.py`
-
 import unittest
-
 class TestLTKV(unittest.TestCase):
-
     def test1(self):
         pass
-
-
 if __name__ == '__main__':
-
    unittest.main()
-```
-
 Now, we want to specify:
-
 * What the script we are running is called
 * What config file is called
 * What the output files is going to be called
 * What the reference file we are comparing this against is going to be called
 * We want a function that will run the script to generate the output
 * We want a test function that will compare the two files and return `True` if the two files are the same
-
 So the test, essentially becomes:
 
-```
-    def test1(self):
-        script  = "simulate_lv.py"
-        config  = "Test1Config.cfg"
-        outfile = "outputT1.csv"
-        reffile = "Test1Output.csv"
-        runTest(script, config, outfile)
-        self.assertTrue(compareFiles(reffile,outfile))
-```
 
-Let's start by looking at the `compareFiles()` function. There is a file comparison function in Python so we can leverage off that:
-
-```
-import filecmp
-
-def compareFiles(file1,file2):
-    return filecmp.cmp(file1,file2)
-```
-
-So, that is fairly straightforward BUT is a bit naive, for instance it will NOT work if you are expecting floating point differences. In that case, you would have to employ a much more sophisticated approach where you have to inspect the
-inside of each file and compare element by element showing that they are
-the same within a given tolerance - to get an idea as to how you might do 
-that have a look at the file [regression_test.py](http://depts.washington.edu/clawpack/users/claw/python/pyclaw/regression_test.py).
-
-Now, let's look at how we might run the code. For this we use the `subprocess` module in Python:
-
-```
-import subprocess
-
-def runTest(script,config,outfile):
-    subprocess.call(["python",script,config,outfile])
-
-```
-
-So the whole script now looks like:
-
-```
-import unittest
-import filecmp
-import subprocess
-
-def runTest(script,config,outfile):
-    subprocess.call(["python",script,config,outfile])
-
-def compareFiles(file1,file2):
-    return filecmp.cmp(file1,file2)
-
-class TestLTKV(unittest.TestCase):
-
-    def test1(self):
-        script  = "simulate_lv.py"
-        config  = "Test1Config.cfg"
-        outfile = "outputT1.csv"
-        reffile = "Test1Output.csv"
-        runTest(script, config, outfile)
-        self.assertTrue(compareFiles(reffile,outfile))
-
-
-if __name__ == '__main__':
-
-   unittest.main()
-```
-
-So let's run the script:
-
-```
-python TestLTKV.py
-F
-======================================================================
-FAIL: test1 (__main__.TestLTKV)
-----------------------------------------------------------------------
-Traceback (most recent call last):
-  File "TestLTKV.py", line 19, in test1
-    self.assertTrue(compareFiles(reffile,outfile))
-AssertionError: False is not true
-
-----------------------------------------------------------------------
-Ran 1 test in 0.608s
-
-FAILED (failures=1)
-```
-
-Oops, what happened there? If you do a `diff` between the two files you get:
-
-```
 diff Test1Output.csv outputT1.csv
 2c2
 < # Produced by simulate_lv.py on Mon Dec 02 15:32:34 2013
