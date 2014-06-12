@@ -37,7 +37,7 @@ echo "Test - no such file"
 python wordcount.py no_such_file.txt none.dat
 test_file_not_exists none.dat
 
-for file in $(ls *.txt); do
+for file in $(ls books/*.txt); do
   name=`basename $file .txt`
   output_file=$name.dat
   echo "Test - $file"
