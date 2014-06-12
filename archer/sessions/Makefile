@@ -12,7 +12,7 @@ jpgs : $(JPG_FILES)
 
 # Calculate word frequencies.
 %.dat : %.txt $(PROCESSOR)
-	python $(PROCESSOR) $< > $@
+	python $(PROCESSOR) $< $@
 
 # Calculate images
 %.jpg : %.dat $(PLOTTER)
