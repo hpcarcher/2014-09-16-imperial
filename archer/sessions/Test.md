@@ -26,35 +26,36 @@ Why testing is important:
 * Correct, trustworthy research:
  * [Geoffrey Chang](http://en.wikipedia.org/wiki/Geoffrey_Chang) had to retract 3 papers from [Science](http://www.sciencemag.org) due to a flipped sign bit.
  * McKitrick and Michaels published an [erratum](http://www.int-res.com/articles/cr2004/27/c027p265.pdf) to a [Climate Research 26(2) 2004](http://www.int-res.com/abstracts/cr/v26/n2/p159-173/) paper due to a [problem](http://crookedtimber.org/2004/08/25/mckitrick-mucks-it-up/) caused by degrees and radians.
-* Avoid embarassment:
- * Ariane 5 used Ariane 4 software. Ariane 5's new engines caused the code to produce a buffer overflow. Ariane 5 blew up!
-* Saves time for research.
+* Avoid embarassment e.g. Ariane 5 used Ariane 4 software. Ariane 5's new engines caused the code to produce a buffer overflow. Ariane 5 blew up!
+* Save money e.g. find a bug on your own server before you submit a job to an expensive HPC resource.
+* Save time e.g. spot bugs before you analyse data produced from your scripts.
 
 Testing checks code:
 
 * Behaves as expected and produces valid output data given valid input data. Any valid input data.
 * Fails gracefully if given invalid input data, does not crash, behave mysteriously, above all, not continue on regardless and burn CPU cycles.
 * Handles extreme boundaries of input domains, output ranges, parametric combinations or any other edge cases.
-* Behaves the same after it changes (add new features, fix bugs, optimise, parallelise) - regression testing. Nothing is worse than fixing a bug only to introduce a new one.
+* Behaves the same after it changes (e.g. add new features, fix bugs, optimise, parallelise) - regression testing. Nothing is worse than fixing a bug only to introduce a new one.
 
-Testing roles:
+Testing documents code:
 
-* Verification - "Have we built the software correctly?" That is, is the code bug free, precise, accurate, and repeatable?
-* Validation - "Have we built the right software?" That is, is the code designed in such a way as to produce the answers we are interested in, data we want, etc.
+* Shows what code does.
+* Shows how to use functions, valid and invalid outputs, expected outputs and behaviours.
 
-Testing as documentation:
+Testing types:
 
-* Help remember what code does.
-* Help remember how to use code e.g. how to use each function, its inputs, outputs, behaviour and restrictions.
+* Verification - "Have we built it correctly?" Is it bug free, precise, accurate, and repeatable?
+* Validation - "Have we built the right thing?" Is it designed in such a way as to produce the answers we are interested in, data we want, etc?
 
 Finding bugs before testing
 ---------------------------
 
 Question: what is single most effective way of finding bugs?
 
-Answer: Fagan (1976) Rigorous inspection can remove 60-90% of errors before the first test is run. Cohen (2006) The value of a code review comes within the first hour, after which reviewers can become exhausted and the issues they find become ever more trivial.
-* M.E., Fagan (1976). [Design and Code inspections to reduce errors in program development](http://www.mfagan.com/pdfs/ibmfagan.pdf). IBM Systems Journal 15 (3): pp. 182-211.
-* J. Cohen (2006). [Best Kept Secrets of Peer Code Review](http://smartbear.com/SmartBear/media/pdfs/best-kept-secrets-of-peer-code-review.pdf). SmartBear, 2006. ISBN-10: 1599160676. ISBN-13: 978-1599160672.
+Answer: 
+
+* Fagan (1976) Rigorous inspection can remove 60-90% of errors before the first test is run. M.E., Fagan (1976). [Design and Code inspections to reduce errors in program development](http://www.mfagan.com/pdfs/ibmfagan.pdf). IBM Systems Journal 15 (3): pp. 182-211.
+* Cohen (2006) The value of a code review comes within the first hour, after which reviewers can become exhausted and the issues they find become ever more trivial. J. Cohen (2006). [Best Kept Secrets of Peer Code Review](http://smartbear.com/SmartBear/media/pdfs/best-kept-secrets-of-peer-code-review.pdf). SmartBear, 2006. ISBN-10: 1599160676. ISBN-13: 978-1599160672.
 
 Introducing tests from the outside-in
 -------------------------------------
@@ -63,19 +64,17 @@ Software testing often is introduced via unit tests, which test small individual
 
 Researchers inherit large codes, which may not have any tests. Where does one start with a unit test?
 
-Incrementally evolve a test framework from the outside in and explore options available.
+Evolve tests from the outside-in.
 
-Examples:
-
-* Software Sustainability Institute project to introduce a test framework for BASIL and FABBER shell and C++ image analysis software.
-* EPCC and the Colon Cancer Genetics Group (CCGG) of the MRC Human Genetics Unit at the Western General as part of an [Oncology](http://www.edikt.org/edikt2/OncologyActivity) project to optimise and parallelise a FORTRAN genetics code.
+* [Software Sustainability Institute](http://www.software.ac.uk) project to introduce a test framework for [FABBER](http://fsl.fmrib.ox.ac.uk/fsl/fslwiki/FABBER) C++ image analysis software.
+* EPCC and the Colon Cancer Genetics Group (CCGG) of the MRC Human Genetics Unit at the Western General optimised and parallelised FORTRAN genetics code.
 
 Will use as a research code `wordcount.py` which takes in a text file and outputs a data file with words and their frequencies.
 
 End-to-end tests and the shell
 ------------------------------
 
-Question: what is possibly the simplest test we could do? `wordcount.py` reads an input file and writes an output file.
+Question: what is possibly the simplest test we could do? 
 
 Answer: check there is an output file produced for a valid input file.
 
@@ -98,7 +97,7 @@ Create `test_word_count.sh`:
     python wordcount.py books/abyss.txt abyss.dat
     test_file_exists abyss.dat
 
-Use shell functions as these commands will be called more than once. Think ahead. Plan for reuse.
+Use shell functions as these commands will be called more than once - anticipate reuse.
 
 Run:
 
@@ -178,21 +177,19 @@ Extend tests to check actual outputs against expected outputs:
     python wordcount.py books/abyss.txt abyss.dat
     test_files_equal abyss.dat expected/abyss.dat
 
+Run:
+
     $ ./test_word_count.sh
 
 Check no cheating:
 
     test_files_equal abyss.dat expected/kim.dat
 
-    $ ./test_word_count.sh
-
 Restore:
 
     test_files_equal abyss.dat expected/abyss.dat
 
-    $ ./test_word_count.sh
-
-Hard-coding the sample file names can be problematic. Automate:
+Loop over the files rather than hard-coding every name. Reduce duplicated code:
 
     for file in $(ls books/*.txt); do
       name=`basename $file .txt`
@@ -203,7 +200,7 @@ Hard-coding the sample file names can be problematic. Automate:
       test_files_equal $output_file expected/$output_file
     done
 
-    $ ./test_word_count.sh
+Let's recode with our test framework to help detect any bugs.
 
 Exercise 2 - recode `wordcount.py`
 ----------------------------------
@@ -223,20 +220,19 @@ Solution:
 Test structure
 --------------
 
-Tests follow a common pattern:
+Test structure:
 
 * Set-up expected outputs given known inputs e.g. `expected/.dat` files or `0` for the return code.
 * Run component on known inputs.
 * Check if actual outputs match expected outputs.
 
-This includes:
+Regardless of wherher it is a test of a:
 
-* A unit test of a 10 line function.
-* Test of a component or library.
-* Test of a serial application running on a single processor.
-* Test of a parallel application running on a multiple processors.
-
-...whether manually done or automated!
+* 10 line function.
+* Component or library.
+* Serial application running on a single processor.
+* Parallel application running on a multiple processors.
+* Automated or manual!
 
 Data file meta-data
 -------------------
@@ -264,11 +260,9 @@ Question: what is the problem?
 
 Answer: the meta-data. `diff` is too simplistic now. 
 
-Workaround 0 use shell commands to slice out problematic lines. But, files may have too complex a structure for simple manipulations.
+Use shell commands to slice out problematic lines. But, files may have too complex a structure for this to work.
 
-Typically want fine-grained tests of equality between data files, using information about the file content and structure. Discriminate between syntactic and semantic content.
-
-Principle applies not only when comparing data files en masse but also when testing components at any level of granularity.
+Want finer-grained tests of equality between data files, using information about the file content and structure, and to discriminate between syntactic and semantic content.
 
 When 0.1 + 0.2 == 3.00000000004
 -------------------------------
@@ -291,7 +285,7 @@ Compare for equality within a given threshold, or delta e.g. *expected* and *act
 Testing at finer-granularities - towards unit tests
 ---------------------------------------------------
 
-End-to-end automated testing is better than nothing. Ideally, though, tests at varying levels of granularity should be written.
+End-to-end automated testing is better than nothing. But, ideally, tests at varying levels of granularity should be written.
 
 If every component has a set of tests then changes to the component can be tested before the component is integrated.
 
@@ -314,7 +308,7 @@ Many examples exist including:
 * An empty file returns an empty list.
 * A non-existent file raises an error.
 
-'save_word_counts(file, counts)'
+`save_word_counts(file, counts)`
 
 * An empty list results in an empty file.
 * A non-empty list results in a file with a number of lines equal to the number of tuples + 5 (for the meta-data lines).
@@ -362,7 +356,7 @@ Create `test_wordcount.py`:
       counts = {}
       update_word_counts(line, counts)
 
-For checking outputs and behaviours, [nose](https://pypi.python.org/pypi/nose/) provides a library of functions. These include tests for equality, inequality, boolean values, thrown exceptions etc.
+Python [nose](https://pypi.python.org/pypi/nose/) provides a library of functions. These include tests for equality, inequality, boolean values, thrown exceptions etc.
 
     from nose.tools import assert_equal
 
@@ -371,17 +365,19 @@ For checking outputs and behaviours, [nose](https://pypi.python.org/pypi/nose/) 
 
     test_update_word_counts()
 
+Run:
+
     $ python test_wordcount.py
 
 `nose` also comes with a tool, `nosetests` which automatically finds, runs and reports on tests.
 
-    $ nosetests test_wordcount.p
+    $ nosetests test_wordcount.py
 
 `.` denotes successful test function calls.
 
-`nosetests` uses reflection to find out the test functions, so remove the `test_update` call.
+`nosetests` uses reflection to find out the test functions. Looks for `test_` function, module and file prefixes.
 
-    $ nosetests test_wordcount.py
+Remove the `test_update_word_counts()` call and rerun.
 
 Add another test:
 
@@ -394,11 +390,7 @@ Add another test:
       assert_equal(1, counts.get("carpentry"))
       assert_equal(1, counts.get("training"))
 
-`nose` is an [xUnit test framework](http://en.wikipedia.org/wiki/XUnit).
-
-JUnit, CUnit, FUnit, ...
-
-`test_` file and function prefix, `Test` class prefix.
+`nose` is an [xUnit test framework](http://en.wikipedia.org/wiki/XUnit). Others are JUnit, CUnit, google-test, FRUIT, pFUnit etc.
 
 xUnit test report, standard format, convert to HTML, present online.
 
@@ -408,26 +400,20 @@ xUnit test report, standard format, convert to HTML, present online.
 Defensive programming
 ---------------------
 
-Suppose someone decides to pass an invalid set of counts to `calculate_percentages`
+Suppose an invalid set of counts are passed to `calculate_percentages`:
 
     from wordcount import calculate_percentages
 
     counts = [("software", 1), ("software", -4)]
     print calculate_percentages(counts)
 
-    $ python test_wordcount.py
-
-Assume that mistakes will happen and guard against them.
+Assume that mistakes will happen and guard against them. Defensive programming.
 
     def calculate_percentages(counts):
       total = 0
       for count in counts:
         assert count[1] >= 0
         total += count[1]
-
-    $ python test_wordcount.py
-
-Defensive programming. 
 
 Programs like Firefox  are full of assertions: 10-20% of their code is to check that the other 80-90% is working correctly.
 
@@ -476,11 +462,13 @@ Floating point numbers
 
 Python [decimal](http://docs.python.org/2/library/decimal.html), floating-point arithmetic functions.
 
-[Numpy](http://www.numpy.org/)'s `numpy.testing` uses relative tolerance: abs(x, y) <= delta * (max(abs(x), abs(y)). 
+[Numpy](http://www.numpy.org/) `numpy.testing` uses relative tolerance: abs(x, y) <= delta * (max(abs(x), abs(y)). 
 
-Two files produced by the same software, with the same inputs, under the same configuration. One job run on on 2x1 processors, one on 4x2 processors.
+`data/` has files produced by the same software, with the same inputs, under the same configuration. One job run on on 2x1 processors, one on 4x2 processors:
 
     $ diff -q data/2x1.dat data/data4x2.dat
+
+Use `numpy` to load and compare:
 
     import numpy as np
 
@@ -508,7 +496,7 @@ A simple automatic triggering of automated tests is via a Unix `cron` job.
 
 A more advanced approach is via a continuous integration server. These trigger automated test runs and publish the results.
 
-* [Muon Ion Cooling Experiment](http://www.mice.iit.edu/) (MICE) have a large number of tests written in Python. They use [Jenkins]() to build their code and trigger the running of the tests which are then [published online](https://micewww.pp.rl.ac.uk/tab/show/maus).
+* [Muon Ion Cooling Experiment](http://www.mice.iit.edu/) (MICE) have a large number of tests written in Python. They use [Jenkins](http://jenkins-ci.org/) to build their code and trigger the running of the tests which are then [published online](http://test.mice.rl.ac.uk/).
 * [Apache Hadoop Common Jenkins dashboard](https://builds.apache.org/job/Hadoop-Common-trunk/)
 
 Tests are code
@@ -548,15 +536,11 @@ Turn bugs into assertions or tests. Check that bugs do not reappear.
 When to finish writing tests:
 
 * "It is nearly impossible to test software at the level of 100 percent of its logic paths", fact 32 in R. L. Glass (2002) [Facts and Fallacies of Software Engineering](http://www.amazon.com/Facts-Fallacies-Software-Engineering-Robert/dp/0321117425) ([PDF](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.94.2037&rep=rep1&type=pdf)).
-* Not being able to test everything is no excuse for not testing anything.
-* Consider, when do you finish proof reading a paper? Learn from experience. 
+* No excuse for not testing anything.
+* When do you finish proof reading a paper? Learn from experience. 
 
-Testing:
+Remember:
 
-* Saves time.
-* Gives confidence that code does what it is meant to.
-* Promotes trust that data, and results, and research, derived from that code is correct.
-
-Remember [Geoffrey Chang](http://en.wikipedia.org/wiki/Geoffrey_Chang)
-
-"If it's not tested, it's broken" - Bruce Eckel, in [Thinking in Java, 3rd Edition](http://www.mindview.net/Books/TIJ/).
+* Geoffrey Chang.
+* "If it's not tested, it's broken" - Bruce Eckel, in [Thinking in Java, 3rd Edition](http://www.mindview.net/Books/TIJ/).
+* ["Testing is science"](http://maori.geek.nz/post/testing_your_code_is_doing_science) - Graham Jenson.

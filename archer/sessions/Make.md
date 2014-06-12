@@ -57,24 +57,28 @@ Count the words in a text file:
 
     $ python wordcount.py books/war.txt war.dat
     $ head war.dat
+    $ python wordcount.py books/abyss.txt abyss.dat
+    $ head abyss.dat
 
 Count the words in a text file over a certain length:
 
     $ python wordcount.py books/war.txt war.dat 12
     $ head war.dat
 
-Plot the first 10 word counts in a data file:
+Plot the first 10 word counts:
 
     $ python plotcount.py war.dat show
+    $ python plotcount.py abyss.dat show
 
 Plot the first N word counts in a data file:
 
     $ python plotcount.py war.dat show N
+    $ python plotcount.py abyss.dat show N
 
-Plot the first 10 word counts in a data file and save:
+Plot the word counts in a data file and save:
 
     $ python plotcount.py war.dat war.jpg
-    $ python plotcount.py war.dat war5.jpg 5
+    $ python plotcount.py war.dat war.jpg 5
 
 A first makefile
 ----------------
@@ -164,15 +168,6 @@ Solution:
         python wordcount.py books/bridge.txt bridge.dat
 
     all : war.dat jekyll.dat bridge.dat
-
-Aside:
-
-    head war.dat
-    head kim.dat
-    head bridge.dat
-    python plotcount.py -show war.dat
-    python plotcount.py -show kim.dat
-    python plotcount.py -show bridge.dat
 
 Patterns
 --------
@@ -364,20 +359,23 @@ Conclusion
 
 See [the purpose of Make](MakePurpose.png).
 
-Make:
-* Automates repetitive tasks
-* Reduces errors
-* Frees up time to do research
+Build tools:
 
-Documents:
-* How your software is built
-* How your data is created
-* How your reports are formed
-* Dependencies between your analysis programs, input and configuration data, and output data
+* Automate repetitive tasks.
+* Reduce errors.
+* Free up time to do research.
 
-Build files are programs
-* Use meaningful variable names
-* Provide useful comments
-* Separate configuration from computation
-* Keep under revision control
-* Treat them with same respect you give any program
+Built scripts document:
+
+* How your software is built.
+* How your data is created.
+* How your reports are formed.
+* Dependencies between your analysis programs, input and configuration data, and output data.
+
+Build scripts are programs:
+
+* Use meaningful variable names.
+* Provide useful comments.
+* Separate configuration from computation.
+* Keep under revision control.
+* Treat them with same respect you give any program.

@@ -13,14 +13,14 @@ Exercise 2 - recode `wordcount.py`
 
 With the simple test harness in-place recode, wordcount.py
 
-* Replace the `DELIMITERS` list with `".,;:?$@^<>#%`!*-=()[]{}/\"\'"`
+* Replace the `DELIMITERS` list with ".,;:?$@^<>#%`!*-=()[]{}/\"\'"
 * Define: `TRANSLATE_TABLE = string.maketrans(DELIMITERS, len(DELIMITERS) * " ")`
-* Replase the inefficient `for purge` loop with use of Python's string `translate` function (Google for its use).
+* Replase the inefficient `for purge` loop with Python's string `translate` function (Google for its use).
 
 Exercise 3 - propose tests for `wordcount.py`
 ---------------------------------------------
 
-With a partner, or in threes, write down a list of possible tests for each function in `wordcount.py`.
+With a partner, or in threes, write down possible tests for each function in `wordcount.py`.
 
 Remember that testing with invalid arguments or boundary conditions can be as important if testing with valid arguments one knows to be correct.
 
