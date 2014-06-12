@@ -42,9 +42,9 @@ Save time.
 Input and output redirection
 ----------------------------
 
-    $ ls *.txt > txt_files.txt  # > redirects output (AKA standard output)
+    $ ls books/*.txt > txt_files.txt  # > redirects output (AKA standard output)
     $ cat txt_files.txt
-    $ wc *.txt > words.txt
+    $ wc books/*.txt > words.txt
     $ cat words.txt
     $ cat > myscript.txt  # Echo standard input and redirect
     Blah
@@ -58,7 +58,7 @@ Question: Why is this empty?
 Answer: outputs and errors happen on two different streams.
 
     $ ls *.cfg 2> output.txt  # 2 is standard error
-    $ ls *.txt 1> output.txt  # 1 is standard output
+    $ ls books/*.txt 1> output.txt  # 1 is standard output
     $ ls *.cfg *.txt *.png > output.txt 2>&1
 
     $ ./interactive.sh
@@ -71,7 +71,7 @@ Backticks
 
 Everything inside backticks is executed before the current command. The output is used within the current command:
 
-    $ FILES=`ls *.txt`  # FILES is a shell variable.
+    $ FILES=`ls books/*.txt`  # FILES is a shell variable.
     $ echo $FILES
     $ HOST=`hostname`
     $ echo HOST
@@ -143,10 +143,11 @@ These spawn a new shell, run the commands and shut down the new shell. This can 
 Packaging
 ---------
 
+    $ mkdir tmp
+    $ cd tmp
+    $ cp ../books/*.txt .
     $ tar -cvzf books.tar.gz *txt  # TAR Create Verbose, TAR File, gZip
-    $ mkdir unpack
-    $ cd unpack
-    $ mv books.tar.gz unpack
+    $ rm *.txt
     $ tar -xvf books.tar.gz  # eXtract
 
 Put content in a directory then zip or tar up that single directory so it doesn't overwite someone else's files when unpacked.
@@ -154,12 +155,10 @@ Put content in a directory then zip or tar up that single directory so it doesn'
 Put the version number or a date in the bundle name. If someone asks for advice, you'll know exactly what version they have.
 
     $ cd ..
-    $ mkdir books
-    $ cp *.txt books
     $ tar -cvzf books.tar.gz books
     $ mkdir unpack-nice
-    $ mv books.tar.gz
     $ cd unpack-nice
+    $ mv ../books.tar.gz .
     $ tar -xvf books.tar.gz  # eXtract
 
     $ ls -l books.tar.gz
@@ -246,7 +245,7 @@ Dr. Drang (2011) [More shell, less egg](http://www.leancrew.com/all-this/2011/12
 10 plus pages of Pascal ... or ... 1 line of shell:
 
     $ cat wordcount.sh
-    $ ./wordcount < war.txt
-    $ ./wordcount < war.txt 10
+    $ ./wordcount.sh < books/war.txt
+    $ ./wordcount.sh < books/war.txt 10
 
 "A wise engineering solution would produce, or better, exploit-reusable parts." - Doug McIlroy

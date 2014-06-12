@@ -1,8 +1,8 @@
 include config.mk
 
-TXT_FILES=$(shell find . -type f -name '*.txt')
-DAT_FILES=$(patsubst %.txt, %.dat, $(TXT_FILES))
-JPG_FILES=$(patsubst %.txt, %.jpg, $(TXT_FILES))
+TXT_FILES=$(shell find books -type f -name '*.txt')
+DAT_FILES=$(patsubst books/%.txt, %.dat, $(TXT_FILES))
+JPG_FILES=$(patsubst books/%.txt, %.jpg, $(TXT_FILES))
 
 .PHONY : dats
 dats : $(DAT_FILES)
@@ -11,7 +11,7 @@ dats : $(DAT_FILES)
 jpgs : $(JPG_FILES)
 
 # Calculate word frequencies.
-%.dat : %.txt $(PROCESSOR)
+%.dat : books/%.txt $(PROCESSOR)
 	python $(PROCESSOR) $< $@
 
 # Calculate images

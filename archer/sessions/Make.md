@@ -55,12 +55,12 @@ A simple data processing pipeline
 
 Count the words in a text file:
 
-    $ python wordcount.py war.txt war.dat
+    $ python wordcount.py books/war.txt war.dat
     $ head war.dat
 
 Count the words in a text file over a certain length:
 
-    $ python wordcount.py war.txt war.dat 12
+    $ python wordcount.py books/war.txt war.dat 12
     $ head war.dat
 
 Plot the first 10 word counts in a data file:
@@ -76,29 +76,28 @@ Plot the first 10 word counts in a data file and save:
     $ python plotcount.py war.dat war.jpg
     $ python plotcount.py war.dat war5.jpg 5
 
-
 A first makefile
 ----------------
 
 Type command manually:
 
-    $ python wordcount.py war.txt war.dat
+    $ python wordcount.py books/war.txt war.dat
     $ head war.dat
 
 Shell script. But:
 
-    $ touch war.txt
-    $ ls -l war.txt war.dat
+    $ touch books/war.txt
+    $ ls -l books/war.txt war.dat
 
-`war.dat` is now older than `war.txt` - 'out-of-date' - so needs to be updated.
+`war.dat` is now older than `books/war.txt` - 'out-of-date' - so needs to be updated.
 
 If many source files to compile or data files to analyse, don't want to reanalyse them all just because one has changed.
 
 Write a makefile, `Makefile`:
 
     # Calculate word frequencies.
-    war.dat : war.txt
-	    python wordcount.py war.txt war.dat
+    war.dat : books/war.txt
+	    python wordcount.py books/war.txt war.dat
 
 Makefile format: 
 
@@ -125,12 +124,12 @@ Answer: the target is now up-to-date and newer than its dependency.
 
 Add a rule:
 
-    jekyll.dat : jekyll.txt
-        python wordcount.py jekyll.txt jekyll.dat
+    jekyll.dat : books/jekyll.txt
+        python wordcount.py books/jekyll.txt jekyll.dat
 
 `touch` updates a file's time-stamp which makes it look as if it's been modified.
 
-    $ touch jekyll.txt
+    $ touch books/jekyll.txt
     $ make
 
 Nothing happens to `jekyll.dat` as the first rule in the makefile, the default rule, is used.
@@ -145,7 +144,7 @@ Introduce a phony target:
 `all` is not a 'thing' - a file or directory - but depends on 'things' that are, and so can be used to trigger their rebuilding.
 
     $ make all
-    $ touch war.txt jekyll.txt
+    $ touch books/war.txt books/jekyll.txt
     $ make all
 
 Order of rebuilding dependencies is arbitrary.
@@ -161,8 +160,8 @@ See [exercises](MakeExercises.md).
 
 Solution:
 
-    bridge.dat : bridge.txt
-        python wordcount.py bridge.txt bridge.dat
+    bridge.dat : books/bridge.txt
+        python wordcount.py books/bridge.txt bridge.dat
 
     all : war.dat jekyll.dat bridge.dat
 
@@ -227,11 +226,11 @@ Dependencies on data and code
 
 Output data is not just dependent upon input data but also programs that create it. `.dat` files are dependent upon `wordcount.py`.
 
-    war.data : war.txt wordcount.py
+    war.data : books/war.txt wordcount.py
     ...
-    jekyll.dat : jekyll.txt wordcount.py
+    jekyll.dat : books/jekyll.txt wordcount.py
     ...
-    bridge.dat : bridge.txt wordcount.py
+    bridge.dat : books/bridge.txt wordcount.py
      ...
 
 `.txt` files are input files and have no dependencies. To make these depend on `python.py` would introduce a 'false dependency'.
@@ -246,7 +245,7 @@ Makefile still has duplicated and repeated content. Where?
 
 Replace `.dat` targets and dependencies with a single target and dependency:
 
-    %.dat : %.txt wordcount.py
+    %.dat : books/%.txt wordcount.py
 
 `%` is a Make wild-card and this rule is termed a 'pattern rule'.
 
@@ -259,7 +258,7 @@ You will need an automatic variable `$<` which means 'use the first dependency o
 
 Solution: 
 
-    %.dat : %.txt wordcount.py
+    %.dat : books/%.txt wordcount.py
 	    python wordcount.py $< $@
 
 Macros
@@ -288,7 +287,7 @@ Solution:
     PROCESSOR=wordcount.py
 
     # Calculate word frequencies.
-    %.dat : %.txt $(PROCESSOR)
+    %.dat : books/%.txt $(PROCESSOR)
         python $(PROCESSOR) $< $@
 
     analysis.tar.gz : *.dat $(PROCESSOR)
@@ -317,7 +316,7 @@ What make will do
 
 If unsure of what make would do:
 
-    $ touch *.txt
+    $ touch books/*.txt
     $ make -n analysis.tar.gz
 
 Displays commands that make would run.
@@ -350,9 +349,9 @@ Configuration file, `config.mk`:
 
 To recreate all `.dat` and `.jpg` files:
 
-    TXT_FILES=$(shell find . -type f -name '*.txt')
-    DAT_FILES=$(patsubst %.txt, %.dat, $(TXT_FILES))
-    JPG_FILES=$(patsubst %.txt, %.jpg, $(TXT_FILES))
+    TXT_FILES=$(shell find books -type f -name '*.txt')
+    DAT_FILES=$(patsubst books/%.txt, %.dat, $(TXT_FILES))
+    JPG_FILES=$(patsubst books/%.txt, %.jpg, $(TXT_FILES))
 
     .PHONY : dats
     dats : $(DAT_FILES)

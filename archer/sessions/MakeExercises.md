@@ -9,7 +9,7 @@ Add in a rule for `bridge.dat`, based on the rules for `war.dat` and
 
 Be sure to use a single tab when indenting the actions, not spaces!
 
-`touch` all the *.txt files.
+`touch` all the `books/*.txt` files.
 
 Re-run `make` and all the `.dat` files should be rebuilt.
 
