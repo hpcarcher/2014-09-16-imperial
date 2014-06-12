@@ -24,4 +24,4 @@ analysis.tar.gz : *.dat *.jpg $(PROCESSOR)
 clean : 
 	rm -f *.dat
 	rm -f *.jpg
-        rm -f analysis.tar.gz
+	rm -f analysis.tar.gz
