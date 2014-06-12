@@ -55,7 +55,7 @@ A first makefile
 
 Type command manually:
 
-    python wordcount.py war.txt > war.dat
+    python wordcount.py war.txt war.dat
     head war.dat
 
 Shell script. But:
@@ -71,7 +71,7 @@ Write a makefile, `Makefile`:
 
     # Calculate word frequencies.
     war.dat : war.txt
-	    python wordcount.py war.txt > war.dat
+	    python wordcount.py war.txt war.dat
 
 Makefile format: 
 
@@ -99,7 +99,7 @@ Answer: the target is now up-to-date and newer than its dependency.
 Add a rule:
 
     jekyll.dat : jekyll.txt
-        python wordcount.py jekyll.txt > jekyll.dat
+        python wordcount.py jekyll.txt jekyll.dat
 
 `touch` updates a file's time-stamp which makes it look as if it's been modified.
 
@@ -135,7 +135,7 @@ See [exercises](MakeExercises.md).
 Solution:
 
     bridge.dat : bridge.txt
-        python wordcount.py bridge.txt > bridge.dat
+        python wordcount.py bridge.txt bridge.dat
 
     all : war.dat jekyll.dat bridge.dat
 
@@ -233,7 +233,7 @@ You will need an automatic variable `$<` which means 'use the first dependency o
 Solution: 
 
     %.dat : %.txt wordcount.py
-	    python wordcount.py $< > $@
+	    python wordcount.py $< $@
 
 Macros
 ------
@@ -262,7 +262,7 @@ Solution:
 
     # Calculate word frequencies.
     %.dat : %.txt $(PROCESSOR)
-        python $(PROCESSOR) $< > $@
+        python $(PROCESSOR) $< $@
 
     analysis.tar.gz : *.dat $(PROCESSOR)
         tar -czf $@ $^
@@ -309,7 +309,7 @@ Makefile, `Makefile`:
 
     # Calculate word frequencies.
     %.dat : %.txt $(PROCESSOR)
-        python $(PROCESSOR) $< > $@
+        python $(PROCESSOR) $< $@
 
     # Calculate images
     %.jpg : %.dat $(PLOTTER)
