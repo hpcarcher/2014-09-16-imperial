@@ -70,9 +70,9 @@ CHECKS = [
     'virtual-browser',
 # Version control
     'git',
-    'hg',              # Command line tool
+    #'hg',              # Command line tool
     #'mercurial',       # Python package
-    'EasyMercurial',
+    #'EasyMercurial',
 # Build tools and packaging
     'make',
     'virtual-pypi-installer',
@@ -81,7 +81,7 @@ CHECKS = [
 # Testing
     'nosetests',       # Command line tool
     'nose',            # Python package
-    'py.test',         # Command line tool
+    #'py.test',         # Command line tool
     'pytest',          # Python package
 # SQL
     'sqlite3',         # Command line tool
@@ -98,7 +98,7 @@ CHECKS = [
     'sympy',
     'Cython',
     'networkx',
-    'mayavi.mlab',
+    #'mayavi.mlab',
     ]
 
 CHECKER = {}
