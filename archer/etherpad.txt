@@ -14,6 +14,11 @@ Boot camp web page:
 
     http://hpcarcher.github.io/2014-07-21-cranfield
 
+GitHub repositories:
+
+    http://github.com/hpcarcher/2014-07-21-cranfield-students
+    http://github.com/hpcarcher/2014-07-21-cranfield
+
 To start, please add yourself to the attendee list below:
 
 * Attendee (discipline, institution)
