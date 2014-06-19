@@ -159,12 +159,16 @@ Put the version number or a date in the bundle name. If someone asks for advice,
     $ mkdir unpack-nice
     $ cd unpack-nice
     $ mv ../books.tar.gz .
+
+List files that will be unpacked, without unpacking them:
+  
+    $ tar -tvf books.tar.gz  # lisT
     $ tar -xvf books.tar.gz  # eXtract
+
+For files online, file size and MD5 sum allow others to check the files have not been tampered with:
 
     $ ls -l books.tar.gz
     $ md5sum books.tar.gz  # MD5 checksum
-
-For files online, file size and MD5 sum allow others to check the files have not been tampered with.
 
 Jobs
 ----
@@ -189,8 +193,20 @@ Jobs
     $ kill %3
     $ jobs -l
 
-Script (not on GitBash)
-------
+`tee` and `script`
+------------------
+
+Capture standard outpupt in the middle of a pipeline:
+
+    $ ls -l *.sh | tee log.txt
+    $ cat log.txt
+    $ history | tee raw.txt | grep "tar" | tee filtered.txt
+    $ ls -l *.sh | tee log.txt
+    $ ls -l *.py | tee -a log.txt # Append
+
+[How tee works](http://en.wikipedia.org/wiki/Tee_(command)#mediaviewer/File:Tee.svg)
+
+    $ ls *.txt 2>&1 | tee log.txt
 
     $ script
     $ ls -l
@@ -205,8 +221,30 @@ Send exact copy of command and error message to support or paste into a ticket.
 
 Rework into a blog or tutorial.
 
-bash_profile and .bashrc
-------------------------
+Executables
+-----------
+
+Path:
+
+    $ echo $PATH
+    $ interactive.sh
+    $ PATH=~:$PATH
+    $ interactive.sh
+
+`type' is a BASH built-in command which describes commands:
+
+    $ type git
+    $ type ls # "is hashed" means it's cached so no need to re-search $PATH
+    $ type python
+    $ type interactive.sh
+    $ type -t python # Type e.g. "file"
+    $ type -t type # Type e.g. "builtin"
+    $ type -a python # All places in $PATH with this command
+
+Wrong version of a compiler, interpreter, tool being used? Check the path.
+
+.bash_profile and .bashrc
+-------------------------
 
 Useful for:
 
@@ -221,9 +259,14 @@ Useful for:
     $ bash
     $ CTRL-D
 
-`.bash_profile` is read when a login, shell is created.
+When a login shell is created:
 
-`.bashrc` is read when an interactive, but non-login, shell is created.
+* `.bashrc` is read
+* `.bash_profile` is read.
+
+When an interactive, non-login, shell is created:
+
+* `.bashrc` is read
 
 Distinction is important when running applications that spawn new shells e.g. `mpiexec.hydra`.
 
