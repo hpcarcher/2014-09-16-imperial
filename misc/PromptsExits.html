@@ -1,0 +1,124 @@
+---
+layout: lesson
+root: ..
+title: Recognising prompts and how to exit
+---
+
+<h2>I don't recognise my prompt...where am I?</h2>
+<p>
+  <code>GNU nano</code> is at the top of your window? You're in
+  <code>nano</code>. 
+</p>
+<p>
+  Your window looks like the following? You're in <code>vi</code>. 
+</p>
+<pre>
+    ~
+    ~
+    ~    
+    ~
+    "somefilename" ...
+</pre>
+<p>
+  Something like <code>somefilename  (Fundamental) ----</code> is at the
+  bottom of your window? You're in <code>emacs</code> or
+  <code>xemacs</code>.  
+</p>
+<p>
+  <code>XEmacs: somefilename  (Fundamental) ----</code> is at the
+  bottom of your window? You're in <code>xemacs</code>. 
+</p>
+<p>
+  Your prompt is <code>>>></code> ? You're in <code>python</code>.
+</p>
+<p>
+  Your prompt is <code>In [123]:</code> ? You're in <code>ipython</code>.
+</p>
+<p>
+  <code>--More--(...%)</code> is at the bottom-left of your window?
+  You're in <code>more</code>. 
+</p>
+<p>
+  <code>Manual page...</code> is at the bottom-left of your window?
+  You're in a <code>man</code> page. 
+</p>
+<p>
+  <code>:</code> is at the bottom-left of your window? You're in
+  <code>less</code> or a <code>man</code> page. 
+</p>
+
+<h2>How do I exit from...</h2>
+
+<ul>
+  <li>
+    <code>nano</code>
+    <ul>
+      <li>
+        Press <code>CTRL-X</code>
+      </li>
+      <li>
+        If you have unsaved changes, you will be asked to save these -
+        press <code>y</code> to save, or <code>n</code> to quit without
+        saving.
+      </li> 
+    </ul>
+  </li>
+  <li>
+    <code>vi</code>
+    <ul>
+      <li>
+        Type <code>:q!</code> to exit without saving. 
+      </li>
+      <li>
+        If the text just appears on screen then press <code>ESC</code>
+        then type <code>:q!</code>
+      </li> 
+    </ul>
+  </li>
+  <li>
+    <code>emacs</code> or <code>xemacs</code>
+    <ul>
+      <li>
+        Press <code>CTRL-X CTRL-S</code>
+      </li>
+      <li>
+        If you have unsaved changes, you will be asked to save these -
+        press <code>y</code> to save, or <code>n</code> then type
+        <code>yes</code> to quit without saving.
+      </li> 
+    </ul>
+  </li>
+  <li>
+    <code>python</code>
+    <ul>
+      <li>
+        Type <code>exit()</code> or <code>CTRL-D</code>
+      </li> 
+    </ul>
+  </li>
+  <li>
+    <code>ipython</code>
+    <ul>
+      <li>
+        Type <code>exit()</code>, or <code>CTRL-D</code> then press
+        <code>y</code>
+      </li> 
+    </ul>
+  </li>
+  <li>
+    <code>man</code> page
+    <ul>
+      <li>
+        Press <code>q</code>
+      </li> 
+    </ul>
+  </li>
+  <li>
+    <code>more</code> or <code>less</code>
+    <ul>
+      <li>
+        Press <code>q</code>
+      </li> 
+    </ul>
+  </li>
+</ul>
