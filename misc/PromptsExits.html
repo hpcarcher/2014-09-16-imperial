@@ -1,124 +1,217 @@
 ---
-layout: lesson
+Layout: lesson
 root: ..
 title: Recognising prompts and how to exit
 ---
 
 <h2>I don't recognise my prompt...where am I?</h2>
+
 <p>
-  <code>GNU nano</code> is at the top of your window? You're in
-  <code>nano</code>. 
-</p>
-<p>
-  Your window looks like the following? You're in <code>vi</code>. 
+  If the top of your shell window shows...
 </p>
 <pre>
-    ~
-    ~
-    ~    
-    ~
-    "somefilename" ...
+GNU nano
 </pre>
 <p>
-  Something like <code>somefilename  (Fundamental) ----</code> is at the
-  bottom of your window? You're in <code>emacs</code> or
-  <code>xemacs</code>.  
+  ...you are in the <code>nano</code> text editor.
 </p>
+
 <p>
-  <code>XEmacs: somefilename  (Fundamental) ----</code> is at the
-  bottom of your window? You're in <code>xemacs</code>. 
+  If your shell window shows...
 </p>
+<pre>
+~
+~
+~    
+~
+"filename.txt" ...
+</pre>
 <p>
-  Your prompt is <code>>>></code> ? You're in <code>python</code>.
+  ...you are in the <code>vi</code> text editor.
 </p>
+
 <p>
-  Your prompt is <code>In [123]:</code> ? You're in <code>ipython</code>.
+  If the bottom of your shell window shows...
 </p>
+<pre>
+filename.txt  (Fundamental) ----
+</pre>
 <p>
-  <code>--More--(...%)</code> is at the bottom-left of your window?
-  You're in <code>more</code>. 
+  ...you are in the <code>emacs</code> or <code>xemacs</code> text editor.
 </p>
+
 <p>
-  <code>Manual page...</code> is at the bottom-left of your window?
-  You're in a <code>man</code> page. 
+  If the bottom of your shell window shows...
 </p>
+<pre>
+XEmacs: filename.txt  (Fundamental) ----
+</pre>
 <p>
-  <code>:</code> is at the bottom-left of your window? You're in
-  <code>less</code> or a <code>man</code> page. 
+  ...you are in the <code>xemacs</code> text editor.
+</p>
+
+<p>
+  If your shell prompt is...
+</p>
+<pre>
+&gt;&gt;&gt;
+</pre>
+<p>
+  ... you are in <code>python</code>.
+</p>
+
+<p>
+  If your shell prompt is...
+</p>
+<pre>
+In [123]:
+</pre>
+<p>
+  ...you are in <code>ipython</code>.
+</p>
+
+<p>
+  If your shell prompt is...
+</p>
+<pre>
+&gt;
+</pre>
+<p>
+  ...you may have typed <code>'</code> or <code>"</code>, to specify a string, as part of a shell command but have not typed another <code>'</code> or <code>"</code> to close the string.
+</p>
+
+<p>
+  If the bottom-left of your shell window shows...
+</p>
+<pre>
+--More--(...%)
+</pre>
+<p>
+  ...you are viewing a file using <code>more</code>.
+</p>
+
+<p>
+  If the bottom-left of your shell window shows...
+</p>
+<pre>
+filename.txt
+</pre>
+<p>
+  ...you may be viewing a file using <code>less</code>.
+</p>
+
+<p>
+  If the bottom-left of your shell window shows...
+</p>
+<pre>
+(END)
+</pre>
+<p>
+  ...you may be viewing a file using <code>less</code>.
+</p>
+
+<p>
+  If the bottom-left of your shell window shows...
+</p>
+<pre>
+:
+</pre>
+<p>
+  ...you may be viewing a file using <code>less</code> or viewing a <code>man</code> page.
+</p>
+
+<p>
+  If the bottom-left of your shell window shows...
+</p>
+<pre>
+Manual page...
+</pre>
+<p>
+  ...you are viewing  a <code>man</code> page.
 </p>
 
 <h2>How do I exit from...</h2>
 
+<p>
+<code>nano</code>:
+</p>
 <ul>
   <li>
-    <code>nano</code>
-    <ul>
-      <li>
-        Press <code>CTRL-X</code>
-      </li>
-      <li>
-        If you have unsaved changes, you will be asked to save these -
-        press <code>y</code> to save, or <code>n</code> to quit without
-        saving.
-      </li> 
-    </ul>
+    Press <code>CTRL-X</code>
   </li>
   <li>
-    <code>vi</code>
-    <ul>
-      <li>
-        Type <code>:q!</code> to exit without saving. 
-      </li>
-      <li>
-        If the text just appears on screen then press <code>ESC</code>
-        then type <code>:q!</code>
-      </li> 
-    </ul>
+    If you have unsaved changes, you will be asked to save these - press <code>y</code> to save, or <code>n</code> to quit without saving.
+  </li>
+</ul>
+
+<p>
+<code>vi</code>:
+</p>
+<ul>
+  <li>
+    Type <code>:q!</code> to exit without saving.
   </li>
   <li>
-    <code>emacs</code> or <code>xemacs</code>
-    <ul>
-      <li>
-        Press <code>CTRL-X CTRL-S</code>
-      </li>
-      <li>
-        If you have unsaved changes, you will be asked to save these -
-        press <code>y</code> to save, or <code>n</code> then type
-        <code>yes</code> to quit without saving.
-      </li> 
-    </ul>
+    If this text just appears on screen then press <code>ESC</code> then type <code>:q!</code>
+  </li>
+</ul>
+
+<p>
+<code>emacs</code> or <code>xemacs</code>:
+</p>
+<ul>
+  <li>
+    Press <code>CTRL-X CTRL-C</code>
   </li>
   <li>
-    <code>python</code>
-    <ul>
-      <li>
-        Type <code>exit()</code> or <code>CTRL-D</code>
-      </li> 
-    </ul>
+    If you have unsaved changes, you will be asked to save these - press <code>y</code> to save, or <code>n</code> then type <code>yes</code> to quit without saving.
+  </li>
+</ul>
+
+<p>
+<code>python</code>:
+</p>
+<ul>
+  <li>
+    Type <code>exit()</code> or <code>CTRL-D</code>
+  </li>
+</ul>
+
+<p>
+<code>ipython</code>:
+</p>
+<ul>
+  <li>
+    Type <code>exit()</code>, or <code>CTRL-D</code> then press <code>y</code>
+  </li>
+</ul>
+
+<p>
+<code>man</code> page:
+</p>
+<ul>
+  <li>
+    Press <code>q</code>
+  </li>
+</ul>
+
+<p>
+<code>more</code> or <code>less</code>:
+</p>
+<ul>
+  <li>
+    Press <code>q</code>
+  </li>
+</ul>
+
+<p>
+An open string in a shell, denoted by a <code>&gt;</code> prompt:
+</p>
+<ul>
+  <li>
+    If you can see on screen what the character you used to open the strin g was (<code>'</code> or <code>""</code>) then type the same character again to close the string.
   </li>
   <li>
-    <code>ipython</code>
-    <ul>
-      <li>
-        Type <code>exit()</code>, or <code>CTRL-D</code> then press
-        <code>y</code>
-      </li> 
-    </ul>
-  </li>
-  <li>
-    <code>man</code> page
-    <ul>
-      <li>
-        Press <code>q</code>
-      </li> 
-    </ul>
-  </li>
-  <li>
-    <code>more</code> or <code>less</code>
-    <ul>
-      <li>
-        Press <code>q</code>
-      </li> 
-    </ul>
+    Or, press <code>CTRL-C</code>
   </li>
 </ul>
