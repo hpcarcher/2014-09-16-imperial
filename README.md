@@ -1,6 +1,6 @@
-2014-07-21-cranfield
-====================
+2014-09-16-imperial
+===================
 
-ARCHER Software Carpentry boot camp and Introduction to Scientific Programming in Python.
+ARCHER Software Carpentry boot camp.
 
-Please visit our [website](http://hpcarcher.github.io/2014-07-21-cranfield/).
+Please visit our [website](http://hpcarcher.github.io/2014-09-16-imperial/).
