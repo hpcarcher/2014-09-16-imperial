@@ -4,7 +4,7 @@ Testing Exercises
 Exercise 1 - write a test for no file
 -------------------------------------
 
-Copy `test_file_exists`, rename the copy to `test_file_not_exists` and modify it to test that a file does not exist.
+Copy `file_exists`, rename the copy to `file_not_exists` and modify it to test that a file does not exist.
 
 Add an example test that calls this function.
 

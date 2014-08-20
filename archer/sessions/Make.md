@@ -3,159 +3,130 @@ Automation and Make
 
 Question: what are the problems with this?
 
-    cc -o scheduler main.o schedule.o optimise.o io.o utils.o -I./include -L./lib -lm -lblas -llapack -lrng
+    cc -o scheduler main.o schedule.o optimise.o io.o utils.o -I./include -L./lib -lm -lblas -llapack -lrng
 
 Answer:
 
-* Need to type a lot.
-* Need to remember syntax.
-* Need to remember arguments.
-* Need to remember dependencies.
-* Need to ensure .o files have been created.
+* Type a lot.
+* Remember syntax, flags, inputs, libraries, dependencies.
+* Ensure .o files have been created.
 
-Solution:
+Automate - "write once, run many":
 
-* Record all the tricky software options.
-* Capture software-based processes and dependencies.
-* Regenerate files (binaries, output data) only when needed.
-* Automate - "write once, run many".
+* Reduce retyping.
+* Document syntax, flags, inputs, libraries, dependencies.
+* Recreate files - binaries, output data, graphs - only when needed.
+* Input files => process => output files.
+* Source code => compiler => library or executable.
+* Configuration and data files => analysis => data files.
+* Data files => visualisation => images.
 
 Make:
 
-* Widely-used build tool.
-* Stuart Feldman, Bell Labs, 1977. From summer intern to Vice President of Computer Science at IBM Research and Google ACM Software System Award, 2003.
-* Fast, free, well-documented.
+* Widely-used, fast, free, well-documented, build tool.
+* Stuart Feldman, Bell Labs 1977 summer intern to Vice President of Computer Science at IBM Research and Google ACM Software System Award, 2003.
 
-Other build tools:
+Others:
 
-* Apache ANT
-* Maven
-* Python doit
-* Platform independent build tools e.g CMake, Autoconf/Automake:
- * Automatically discover a machine's configuration.
- * Generate platform-dependent Makefiles or Visual Studio project files.
- * Harder to debug.
+* Apache ANT, Maven, Python doit.
+* Platform independent build tools e.g CMake, Autoconf/Automake generate platform-dependent build scripts e.g. Make, Visual Studio project files etc.
 
-Automated build:
+Data processing pipeline
+------------------------
 
- * Input files => process => output files.
- * Source code => compiler => library or executable.
- * Configuration and data files => processor => data files.
+Count the words in a text file and plot frequencies:
 
-See [Not just for compiling code](MakeUses.jpg).
+    python wordcount.py books/war.txt war.dat     # All words
+    head war.dat
+    python wordcount.py books/abyss.txt abyss.dat
+    head abyss.dat
 
-Example:
+    python wordcount.py books/war.txt war.dat 12  # Words >= 12 characters
+    head war.dat
 
-* Text files.
-* Python script to read text files output words and their frequencies.
-* It doesn't really matter which programs we are using, could be anything.
+    python plotcount.py war.dat show              # Plot top 10 words
+    python plotcount.py abyss.dat show
 
-A simple data processing pipeline
----------------------------------
+    python plotcount.py war.dat show N            # Plot top N words
+    python plotcount.py abyss.dat show N
 
-Count the words in a text file:
+    python plotcount.py war.dat war.jpg           # Plot top 10 and save as JPG
+    python plotcount.py war.dat war.jpg 5
 
-    $ python wordcount.py books/war.txt war.dat
-    $ head war.dat
-    $ python wordcount.py books/abyss.txt abyss.dat
-    $ head abyss.dat
+Makefile
+--------
 
-Count the words in a text file over a certain length:
+    python wordcount.py books/war.txt war.dat
+    head war.dat
 
-    $ python wordcount.py books/war.txt war.dat 12
-    $ head war.dat
+    touch books/war.txt         # Update time-stamp - mock update
+    ls -l books/war.txt war.dat
 
-Plot the first 10 word counts:
+Output `war.dat` is now older than input `books/war.txt`, so needs update.
 
-    $ python plotcount.py war.dat show
-    $ python plotcount.py abyss.dat show
+Question: we could write a shell script but what might be the problems?
 
-Plot the first N word counts in a data file:
+Answer: if many sources to compile or data to analyse, don't want to update everything, just those that need updated.
 
-    $ python plotcount.py war.dat show N
-    $ python plotcount.py abyss.dat show N
-
-Plot the word counts in a data file and save:
-
-    $ python plotcount.py war.dat war.jpg
-    $ python plotcount.py war.dat war.jpg 5
-
-A first makefile
-----------------
-
-Type command manually:
-
-    $ python wordcount.py books/war.txt war.dat
-    $ head war.dat
-
-Shell script. But:
-
-    $ touch books/war.txt
-    $ ls -l books/war.txt war.dat
-
-`war.dat` is now older than `books/war.txt` - 'out-of-date' - so needs to be updated.
-
-If many source files to compile or data files to analyse, don't want to reanalyse them all just because one has changed.
-
-Write a makefile, `Makefile`:
+Create `Makefile`:
 
     # Calculate word frequencies.
     war.dat : books/war.txt
 	    python wordcount.py books/war.txt war.dat
 
-Makefile format: 
+ 
+Add Makefile format information as comments:
 
-* `#` - comment.
+    # Make comments
+    # target: dependency1 dependency1 dependency2 ...
+    # TAB rule1
+    # TAB rule2
+    # TAB rule3
+    # TAB ...
+
 * Target - 'thing' to be built.
 * Dependencies - other 'things' that 'thing' depends upon.
 * Actions - commands to run to build the target, or update it.
- * Actions intented using TAB not 8 spaces.
- * Legacy of make's 1970's origins.
+* Actions indented using TAB, not 8 spaces. Legacy of 70's origins.
 
-Run:
+<p/>
 
-    $ make
-
-`-f` can name a specific makefile. If omitted, then a default of `Makefile` is assumed.
-
-Make uses 'last modification time' to determine if dependencies are newer than targets.
-
-    $ make
+    make              # Use default Makefile
+    make -f Makefile  # Use named makefile
+    make
 
 Question: why did nothing happen?
 
-Answer: the target is now up-to-date and newer than its dependency.
+Answer: the target is now up-to-date and newer than its dependency. Make uses a file's 'last modification time'.
 
-Add a rule:
-
-    jekyll.dat : books/jekyll.txt
-        python wordcount.py books/jekyll.txt jekyll.dat
+    abyss.dat : books/abyss.txt
+        python wordcount.py books/abyss.txt abyss.dat
 
 `touch` updates a file's time-stamp which makes it look as if it's been modified.
 
-    $ touch books/jekyll.txt
-    $ make
+    touch books/abyss.txt
+    make
 
-Nothing happens to `jekyll.dat` as the first rule in the makefile, the default rule, is used.
+Nothing happens as the first, default, rule in the makefile, is used.
 
-    $ make jekyll.dat
+    make abyss.dat
 
-Introduce a phony target:
+Phony targets:
 
     .PHONY : all
-    all : war.dat jekyll.dat
+    all : war.dat abyss.dat
 
-`all` is not a 'thing' - a file or directory - but depends on 'things' that are, and so can be used to trigger their rebuilding.
+`all` is not a file or directory but depends on files and directories, so can trigger their rebuilding.
 
-    $ make all
-    $ touch books/war.txt books/jekyll.txt
-    $ make all
+A dependency in one rule can be a target in another.
+
+    make all
+    touch books/war.txt books/abyss.txt
+    make all
 
 Order of rebuilding dependencies is arbitrary.
 
-A dependency in one rule e.g. `war.dat`, can be a target in another.
-
-Dependencies between files must make up a directed acyclic graph.
+Dependencies must make up a directed acyclic graph.
 
 Exercise 1 - add a rule 
 -----------------------
@@ -167,89 +138,92 @@ Solution:
     bridge.dat : books/bridge.txt
         python wordcount.py books/bridge.txt bridge.dat
 
-    all : war.dat jekyll.dat bridge.dat
+    all : war.dat abyss.dat bridge.dat
 
 Patterns
 --------
 
-Add:
+    analysis.tar.gz : war.dat abyss.dat bridge.dat
+        tar -czf analysis.tar.gz war.dat abyss.dat bridge.dat
 
-    analysis.tar.gz : war.dat jekyll.dat bridge.dat
-        tar -czf analysis.tar.gz war.dat jekyll.dat bridge.dat
+<p/>
 
-Run:
+    make analysis.tar.gz
 
-    $ make analysis.tar.gz
+Makefiles are code. Repeated code creates maintainability issues. 
 
-Duplication and repeated code creates maintainability issues. Makefiles are a type of code.
+    tar -czf $@ war.dat abyss.dat bridge.dat
 
-Rewrite action:
+<p/>
 
-    tar -czf $@ war.dat jekyll.dat bridge.dat
+    # Make's special macros and notation:
+    # $@ Target of the current rule.
 
-`$@` means 'the target of the current rule'. It is an 'automatic variable'.
-
-Rewrite action:
+<p/>
 
     tar -czf $@ $^
 
-`$^` means 'the dependencies of this rule'.
+<p/>
 
-Bash wild-card can be used in file names. Replace dependencies with:
+    # $^ All dependencies of the current rule.
+
+Bash wild-card can be used in file names:
 
     analysis.tar.gz : *.dat
 
-    $ make analysis.tar.gz
-    $ touch *.dat
-    $ make analysis.tar.gz
+<p/>
 
-But watch what happens:
+    make analysis.tar.gz
+    touch *.dat
+    make analysis.tar.gz
 
-    $ rm *.dat
-    $ make analysis.tar.gz
+    rm *.dat
+    make analysis.tar.gz
 
 Question: any guesses as to why this is?
 
 Answer: there are no files that match `*.dat` so the name `*.dat` is used as-is.
 
-Create `.data` files in a more manual way:
-
-    $ make war.dat jekyll.dat bridge.dat
+    make war.dat abyss.dat bridge.dat
 
 Dependencies on data and code
 -----------------------------
 
-Output data is not just dependent upon input data but also programs that create it. `.dat` files are dependent upon `wordcount.py`.
+Output data depends on both input data and programs that create it:
 
     war.data : books/war.txt wordcount.py
     ...
-    jekyll.dat : books/jekyll.txt wordcount.py
+    abyss.dat : books/abyss.txt wordcount.py
     ...
     bridge.dat : books/bridge.txt wordcount.py
-     ...
+    ...
 
-`.txt` files are input files and have no dependencies. To make these depend on `python.py` would introduce a 'false dependency'.
+<p/>
 
-    $ touch wordcount.py
-    $ make all
+    touch wordcount.py
+    make all
+
+`.txt` files are input files and have no dependencies. To make these depend on `wordcount.py` would introduce a 'false dependency'.
 
 Pattern rules
 -------------
 
-Makefile still has duplicated and repeated content. Where?
+Question: Makefile still has repeated content. Where?
 
-Replace `.dat` targets and dependencies with a single target and dependency:
+Answer: the rules for each .dat file.
 
     %.dat : books/%.txt wordcount.py
 
-`%` is a Make wild-card and this rule is termed a 'pattern rule'.
+    # % - Make wild-card
 
 Exercise 2 - simplify a rule 
 ----------------------------
 
 See [exercises](MakeExercises.md).
 
-You will need an automatic variable `$<` which means 'use the first dependency only'.
+You will need another special macro:
+
+    # $< First dependency of the current rule.
 
 Solution: 
 
@@ -259,8 +233,6 @@ Solution:
 Macros
 ------
 
-Add the program to the archive:
-
     analysis.tar.gz : *.dat wordcount.py
 	tar -czf $@ $^
 
@@ -268,9 +240,7 @@ Question: there's still duplication in our makefile, where?
 
 Answer: the program name. Suppose the name of our program changes?
 
-Use a 'macro', a Make variable:
-
-    PROCESSOR=wordcount.py
+    COUNTER=wordcount.py
 
 Exercise 3 - use a macro
 ------------------------
@@ -279,42 +249,35 @@ See [exercises](MakeExercises.md).
 
 Solution:
 
-    PROCESSOR=wordcount.py
+    COUNTER=wordcount.py
 
     # Calculate word frequencies.
-    %.dat : books/%.txt $(PROCESSOR)
-        python $(PROCESSOR) $< $@
+    %.dat : books/%.txt $(COUNTER)
+        python $(COUNTER) $< $@
 
-    analysis.tar.gz : *.dat $(PROCESSOR)
+    analysis.tar.gz : *.dat $(COUNTER)
         tar -czf $@ $^
 
-Keep macros at the top of a Makefile so they are easy to find. Or put in another file.
-
-Move the macros to `config.mk`:
+Keep macros at the top of a Makefile so they are easy to find, or move to `config.mk`:
 
     # Word frequency calculations.
-    PROCESSOR=wordcount.py
+    COUNTER=wordcount.py
 
-Read the macros into the makefile:
+<p/>
 
     include config.mk
 
-A separate configuration allows for one makefile with many configurations:
+Good programming practice:
 
-* No need to edit the makefile which reduces risk of introducing a bug.
-* Separates program (makefile) from its data.
-
-Programs that use configuration files, rather than configuration values hard-coded throughout the code, are more modular, flexible and usable. This applies not just to makefiles but any program.
+* Separate code from data.
+* No need to edit code which reduces risk of introducing a bug.
+* Code that is configurable is more modular, flexible and reusable.
 
 What make will do
 -----------------
 
-If unsure of what make would do:
-
-    $ touch books/*.txt
-    $ make -n analysis.tar.gz
-
-Displays commands that make would run.
+    touch books/*.txt
+    make -n analysis.tar.gz  # Display commands make will run
 
 Exercise 4 - add another processing stage
 -----------------------------------------
@@ -329,7 +292,7 @@ Makefile, `Makefile`:
     %.jpg : %.dat $(PLOTTER)
         python $(PLOTTER) $< $@
 
-    analysis.tar.gz : *.dat *.jpg $(PROCESSOR)
+    analysis.tar.gz : *.dat *.jpg $(COUNTER)
         tar -czf $@ $^
 
     clean : 
@@ -342,7 +305,10 @@ Configuration file, `config.mk`:
     # Image output calculations
     PLOTTER=plotcount.py
 
-To recreate all `.dat` and `.jpg` files:
+shell and patsubst
+------------------
+
+Avoid hard-coding file names:
 
     TXT_FILES=$(shell find books -type f -name '*.txt')
     DAT_FILES=$(patsubst books/%.txt, %.dat, $(TXT_FILES))
@@ -359,23 +325,11 @@ Conclusion
 
 See [the purpose of Make](MakePurpose.png).
 
-Build tools:
+Build scripts:
 
 * Automate repetitive tasks.
 * Reduce errors.
-* Free up time to do research.
-
-Built scripts document:
-
-* How your software is built.
-* How your data is created.
-* How your reports are formed.
-* Dependencies between your analysis programs, input and configuration data, and output data.
-
-Build scripts are programs:
-
-* Use meaningful variable names.
-* Provide useful comments.
-* Separate configuration from computation.
-* Keep under revision control.
-* Treat them with same respect you give any program.
+* Document how software is built, data is created, graphs are done, papers formed.
+* Document dependencies between code, scripts, tools, inputs, configurations, outputs.
+* Are code so use meaningful variable names, comments, and separate configuration from computation.
+* Should be kept under revision control.

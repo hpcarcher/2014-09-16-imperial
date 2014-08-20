@@ -5,7 +5,7 @@ Exercise 1 - add a rule
 -----------------------
 
 Add in a rule for `bridge.dat`, based on the rules for `war.dat` and
-`jekyll.dat`.
+`abyss.dat`.
 
 Be sure to use a single tab when indenting the actions, not spaces!
 
@@ -25,14 +25,15 @@ Exercise 3 - use a macro
 ------------------------
 
 Replace occurrences of `wordcount.py` with the macro-name,
-`$(PROCESSOR)`.
+`$(COUNTER)`.
 
 Exercise 4 - add another processing stage
 -----------------------------------------
 
-Extend the Makefile:
+Add a rule to create `.jpg` files from `.dat` files, using wild-cards.
 
-* Add a rule to create `.jpg` files from `.dat` files, using wild-cards.
-* Modify the `analysis.tar.gz` rule to add the `.jpg` files to the `.gz` file.
-* Use a macro to hold the script name `plotcount.py`.
-* Add a `clean` rule to remove `.jpg` and `.dat` files  and `analysis.tar.gz`.
+Modify the `analysis.tar.gz` rule to add the `.jpg` files to the `.gz` file.
+
+Use a macro to hold the script name `plotcount.py`.
+
+Add a `clean` rule to remove `.jpg` and `.dat` files and `analysis.tar.gz`.
