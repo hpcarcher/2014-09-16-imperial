@@ -116,8 +116,11 @@ Commit changes that can be reviewed by someone else in under an hour.:
     mkdir images
     cd images
 
-    # If no wget then use browser and manually put into directory
+    # Get image
     wget http://www.cookuk.co.uk/images/slow-cooker-winter-vegetable-soup/smooth-soup.jpg
+    # Or
+    curl http://www.cookuk.co.uk/images/slow-cooker-winter-vegetable-soup/smooth-soup.jpg -o smooth-soup.jpg
+    # Or use browser and manually put into directory
 
 Add directory to repository:
 
@@ -167,6 +170,7 @@ Make and commit changes to `soup.md`.
 
     git log
     git log soup.md
+    git log --oneline
     git diff COMMITID
     git diff OLDER_COMMITID NEWER_COMMITID
     git log
