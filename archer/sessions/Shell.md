@@ -197,34 +197,6 @@ Security:
 
 Add version number or date to directory and package for provenance.
 
-Jobs
-----
-
-    count.sh > count1.out &  # Start a job in background
-    count.sh > count2.out &
-    count.sh > count3.out &
-    cat count1.out
-    cat count1.out
-    cat count1.out
-    jobs -l                   # Current jobs + is current, - is previous
-    ps                        # Processes across all shells
-
-    fg 2                      # Bring job to foreground
-    CTRL-Z                    # Suspend job - not GitBash
-    jobs -l
-
-    bg 2                      # Restart job in background 
-    jobs -l
-    fg 1 
-    CTRL-C
-    jobs -l
-
-    kill %2                   # Kill job with given job number
-    jobs -l
-    ps -A
-    kill 3                    # Kill process with given process number
-    jobs -l
-
 Executables
 -----------
 
