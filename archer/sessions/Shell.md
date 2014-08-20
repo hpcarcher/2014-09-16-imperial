@@ -61,17 +61,24 @@ Answer: outputs and errors happen on two different streams.
     ./interactive.sh < config.properties    # < redirects input (AKA standard input)
     ./interactive.sh < config.properties > out.txt 2>&1
 
-Backticks
----------
+Capturing command output
+------------------------
+
+Older versions of bash:
 
     FILES=`ls books/*.txt`  # Contents of `` are executed before the enclosing command.
     echo $FILES
+
+Newer versions of bash and other shells use a clearer syntax:
+
+    FILES=$(ls books/*.txt)  # Contents of $() are executed before the enclosing command.
+    echo $FILES
     for FILE in $FILES; do echo $FILE; done
 
-    HOST=`hostname`
+    HOST=$(hostname)
     echo HOST
 
-    WHEREIWAS=`pwd`
+    WHEREIWAS=$(pwd)
     cd /
     cd $WHEREIWAS
 
