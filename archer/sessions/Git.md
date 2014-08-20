@@ -29,7 +29,7 @@ Tracking changes with a local repository
 Create a local repository
 -------------------------
 
-Make sure you are not in any clone of the boot camp materials!
+Make sure you are not in any clone of the bootcamp materials!
 
     git
     git --version
@@ -186,14 +186,14 @@ Make and commit changes to `soup.md`.
 Use tags as nicknames for commit identifiers
 --------------------------------------------
 
-    git tag BOOT_CAMP  # Human-readable name for cryptic commit identifier.
+    git tag BOOTCAMP  # Human-readable name for cryptic commit identifier.
     git tag
 
 Make and commit changes to `soup.md`.
 
-    git checkout BOOT_CAMP
+    git checkout BOOTCAMP
     git checkout master
-    git diff BOOT_CAMP
+    git diff BOOTCAMP
 
 Tags:
 
@@ -436,13 +436,13 @@ Summary
 * Work solo or with others in a managed way with no risk of losing work.
 * Alternative to e-mail or SFTP code back and forth.
 
-Exercise - Copy the boot camp material
-======================================
+Exercise - Copy the bootcamp material
+=====================================
 
 * Create a `bootcamp` repository on GitHub/BitBucket.
-* Change into the directory you cloned at the start of the boot camp.
+* Change into the directory you cloned at the start of the bootcamp.
 * Push this repository to your remote `bootcamp` repository.
-* Keep using this repository throughout the rest of the boot camp!
+* Keep using this repository throughout the rest of the bootcamp!
 
 Conclusion
 ==========
