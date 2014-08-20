@@ -143,7 +143,9 @@ Command history revisited
 -------------------------
 
     history
-    !NNNN  # Rerun Nth command in history
+    !NNNN   # Rerun Nth command in history - the "bang" command.
+    !NNNN:p # Show, but don't execute, Nth command in history.
+    !ls     # Run last command starting with ls.
     history | grep 'wget'
     CTRL-R
     Type letter(s). CTRL-R to go
