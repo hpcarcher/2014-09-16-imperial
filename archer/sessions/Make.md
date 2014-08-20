@@ -242,6 +242,12 @@ Answer: the program name. Suppose the name of our program changes?
 
     COUNTER=wordcount.py
 
+Question: is there an alternative to this?
+
+Answer: we might change our programming language or the way in which our command is invoked:
+
+    COUNTER=python wordcount.py
+
 Exercise 3 - use a macro
 ------------------------
 
