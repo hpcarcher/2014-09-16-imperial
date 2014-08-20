@@ -264,8 +264,13 @@ Common words problem:
 10 plus pages of Pascal ... or ... 1 line of shell:
 
     cat wordcount.sh
+    tr -cs A-Za-z '\n' | tr A-Z a-z | sort | uniq -c | sort -rn | sed ${1}q
     ./wordcount.sh < books/war.txt
     ./wordcount.sh < books/war.txt 10
+
+Why `sed` and not `head`?
+* `head` takes a whole file and then chops off the top N lines.
+* `sedNq` immediately stops after the first N lines have been processed.
 
 "A wise engineering solution would produce, or better, exploit-reusable parts." - Doug McIlroy
 
