@@ -1,4 +1,4 @@
 # Word frequency calculations.
-PROCESSOR=wordcount.py
+COUNTER=wordcount.py
 # Image output calculations
 PLOTTER=plotcount.py

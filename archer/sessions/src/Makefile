@@ -11,17 +11,17 @@ dats : $(DAT_FILES)
 jpgs : $(JPG_FILES)
 
 # Calculate word frequencies.
-%.dat : books/%.txt $(PROCESSOR)
-	python $(PROCESSOR) $< $@
+%.dat : books/%.txt $(COUNTER)
+	python $(COUNTER) $< $@
 
 # Calculate images
 %.jpg : %.dat $(PLOTTER)
 	python $(PLOTTER) $< $@
 
-analysis.tar.gz : *.dat *.jpg $(PROCESSOR)
+analysis.tar.gz : *.dat *.jpg $(COUNTER)
 	tar -czf $@ $^
 
 clean : 
+	rm -f analysis.tar.gz
 	rm -f *.dat
 	rm -f *.jpg
-	rm -f analysis.tar.gz
