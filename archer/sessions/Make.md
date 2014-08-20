@@ -167,7 +167,7 @@ Makefiles are code. Repeated code creates maintainability issues.
 
     # $^ All dependencies of the current rule.
 
-Bash wild-card can be used in file names:
+Wild-cards can be used in file names:
 
     analysis.tar.gz : *.dat
 
@@ -214,7 +214,7 @@ Answer: the rules for each .dat file.
 
     %.dat : books/%.txt wordcount.py
 
-    # % - Make wild-card
+    # % - Make pattern.
 
 Exercise 2 - simplify a rule 
 ----------------------------
