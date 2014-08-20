@@ -326,6 +326,13 @@ Avoid hard-coding file names:
     .PHONY : jpgs
     jpgs : $(JPG_FILES)
 
+Parallel jobs
+-------------
+
+Make can run on multiple cores if available:
+
+    make -j 4 analysis.tar.gz
+
 Conclusion
 ----------
 
