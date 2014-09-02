@@ -8,23 +8,37 @@ Copy `file_exists`, rename the copy to `file_not_exists` and modify it to test t
 
 Add an example test that calls this function.
 
-Exercise 2 - recode `wordcount.py`
-----------------------------------
+Exercise 2 - recode `jacobi.py`
+-------------------------------
 
-With the simple test harness in-place recode, wordcount.py
+With the simple test harness in-place recode, `jacoby.py`:
 
-* Replace the `DELIMITERS` list with ".,;:?$@^<>#%`!*-=()[]{}/\"\'"
-* Define: `TRANSLATE_TABLE = string.maketrans(DELIMITERS, len(DELIMITERS) * " ")`
-* Replase the inefficient `for purge` loop with Python's string `translate` function (Google for its use).
+* The `while` loops are of form:
 
-Exercise 3 - propose tests for `wordcount.py`
----------------------------------------------
+<p/>
 
-With a partner, or in threes, write down possible tests for each function in `wordcount.py`.
+    VARIABLE = INITIAL_VALUE
+    while VARIABLE < FINAL_VALUE:
+        DO SOMETHING
+        VARIABLE += 1
+
+* A more 'Pythonic' way (a way more in the spirit of the Python language) to write loops is to replace the above with:
+
+<p/>
+
+    for VARIABLE in range(INITIAL_VALUE, FINAL_VALUE)
+        DO SOMETHING
+
+* Replace the five `while` loops with `for` loops.
+
+Exercise 3 - propose unit tests for `cfd.py` and `jacobi.py`
+------------------------------------------------------------
+
+With a partner, or in threes, write down possible tests for each function in `cfd.py` and `jacobi.py`.
 
 Remember that testing with invalid arguments or boundary conditions can be as important if testing with valid arguments one knows to be correct.
 
-Exercise 4 - implement unit tests for `wordcount.py`
-----------------------------------------------------
+Exercise 4 - implement unit tests for `cfd.py` and `jacobi.py`
+--------------------------------------------------------------
 
-Implement more unit tests for `wordcount.py`.
+Implement unit tests for `cfd.py` and `jacobi.py`
