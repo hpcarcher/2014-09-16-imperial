@@ -38,7 +38,7 @@ Computational fluid dynamics (CFD) example:
 
 * Study of the mechanics of fluid flow, liquids and gases in motion.
 * Determine the flow pattern of a fluid in a cavity.
-* Cavity is a square box with an inlet on one side and an outlet on another.
+* Cavity is a square box with an inlet on one side and an outlet on another - [image](./Cavity.png).
 
 Determine the flow pattern:
 
