@@ -34,35 +34,32 @@ Others:
 Data processing pipeline
 ------------------------
 
-Count the words in a text file and plot frequencies:
+Computational fluid dynamics (CFD) example:
 
-    python wordcount.py books/war.txt war.dat     # All words
-    head war.dat
-    python wordcount.py books/abyss.txt abyss.dat
-    head abyss.dat
+* Study of the mechanics of fluid flow, liquids and gases in motion.
+* Determine the flow pattern of a fluid in a cavity.
+* Cavity is a square box with an inlet on one side and an outlet on another.
 
-    python wordcount.py books/war.txt war.dat 12  # Words >= 12 characters
-    head war.dat
+Determine the flow pattern:
 
-    python plotcount.py war.dat show              # Plot top 10 words
-    python plotcount.py abyss.dat show
+    cat configs/32x32.cfg
+    python cfd.py configs/32x32.cfg 32x32.dat
+    head 32x32.dat
 
-    python plotcount.py war.dat show N            # Plot top N words
-    python plotcount.py abyss.dat show N
+Plot the flow pattern:
 
-    python plotcount.py war.dat war.jpg           # Plot top 10 and save as JPG
-    python plotcount.py war.dat war.jpg 5
+    python plot_flow.py 32x32.dat 32x32.jpg
 
 Makefile
 --------
 
-    python wordcount.py books/war.txt war.dat
-    head war.dat
+    python cfd.py configs/32x32.txt 32x32.dat
+    head 32x32.dat
 
-    touch books/war.txt         # Update time-stamp - mock update
-    ls -l books/war.txt war.dat
+    touch configs/32x32.cfg         # Update time-stamp - mock update
+    ls -l configs/32x32.cfg 32x32.dat
 
-Output `war.dat` is now older than input `books/war.txt`, so needs update.
+Output `32x32.dat` is now older than input `configs/32x32.cfg`, so needs update.
 
 Question: we could write a shell script but what might be the problems?
 
@@ -70,11 +67,10 @@ Answer: if many sources to compile or data to analyse, don't want to update ever
 
 Create `Makefile`:
 
-    # Calculate word frequencies.
-    war.dat : books/war.txt
-	    python wordcount.py books/war.txt war.dat
+    # Determine flow pattern
+    32x32.dat : configs/32x32.cfg
+	    python cfd.py configs/32x32.cfg 32x32.dat
 
- 
 Add Makefile format information as comments:
 
     # Make comments
@@ -99,29 +95,29 @@ Question: why did nothing happen?
 
 Answer: the target is now up-to-date and newer than its dependency. Make uses a file's 'last modification time'.
 
-    abyss.dat : books/abyss.txt
-        python wordcount.py books/abyss.txt abyss.dat
+    64x64.dat : configs/64x64.cfg
+        python cfd.py configs/64x64.cfg 64x64.dat
 
 `touch` updates a file's time-stamp which makes it look as if it's been modified.
 
-    touch books/abyss.txt
+    touch configs/64x64.cfg
     make
 
 Nothing happens as the first, default, rule in the makefile, is used.
 
-    make abyss.dat
+    make 64x64.dat
 
 Phony targets:
 
     .PHONY : all
-    all : war.dat abyss.dat
+    all : 32x32.dat 64x64.dat
 
 `all` is not a file or directory but depends on files and directories, so can trigger their rebuilding.
 
 A dependency in one rule can be a target in another.
 
     make all
-    touch books/war.txt books/abyss.txt
+    touch configs/32x32.cfg configs/64x64.cfg
     make all
 
 Order of rebuilding dependencies is arbitrary.
@@ -135,16 +131,16 @@ See [exercises](MakeExercises.md).
 
 Solution:
 
-    bridge.dat : books/bridge.txt
-        python wordcount.py books/bridge.txt bridge.dat
+    96x96.dat : configs/96x96.cfg
+        python cfd.py configs/96x96.cfg 96x96.dat
 
-    all : war.dat abyss.dat bridge.dat
+    all : 32x32.dat 64x64.dat 96x96.dat
 
 Patterns
 --------
 
-    analysis.tar.gz : war.dat abyss.dat bridge.dat
-        tar -czf analysis.tar.gz war.dat abyss.dat bridge.dat
+    analysis.tar.gz : 32x32.dat 64x64.dat 96x96.dat
+        tar -czf analysis.tar.gz 32x32.dat 64x64.dat 96x96.dat
 
 <p/>
 
@@ -152,7 +148,7 @@ Patterns
 
 Makefiles are code. Repeated code creates maintainability issues. 
 
-    tar -czf $@ war.dat abyss.dat bridge.dat
+    tar -czf $@ 32x32.dat 64x64.dat 96x96.dat
 
 <p/>
 
@@ -184,26 +180,26 @@ Question: any guesses as to why this is?
 
 Answer: there are no files that match `*.dat` so the name `*.dat` is used as-is.
 
-    make war.dat abyss.dat bridge.dat
+    make all
 
 Dependencies on data and code
 -----------------------------
 
 Output data depends on both input data and programs that create it:
 
-    war.data : books/war.txt wordcount.py
+    32x32.data : configs/32x32.cfg cfd.py
     ...
-    abyss.dat : books/abyss.txt wordcount.py
+    64x64.dat : configs/64x64.cfg cfd.py
     ...
-    bridge.dat : books/bridge.txt wordcount.py
+    96x96.dat : configs/96x96.cfg cfd.py
     ...
 
 <p/>
 
-    touch wordcount.py
+    touch cfd.py
     make all
 
-`.txt` files are input files and have no dependencies. To make these depend on `wordcount.py` would introduce a 'false dependency'.
+`.cfg` files are input files and have no dependencies. To make these depend on `cfd.py` would introduce a 'false dependency'.
 
 Pattern rules
 -------------
@@ -212,7 +208,7 @@ Question: Makefile still has repeated content. Where?
 
 Answer: the rules for each .dat file.
 
-    %.dat : books/%.txt wordcount.py
+    %.dat : configs/%.cfg cfd.py
 
     # % - Make pattern.
 
@@ -227,27 +223,28 @@ You will need another special macro:
 
 Solution: 
 
-    %.dat : books/%.txt wordcount.py
-	    python wordcount.py $< $@
+    %.dat : configs/%.cfg cfd.py
+	    python cfd.py $< $@
 
 Macros
 ------
 
-    analysis.tar.gz : *.dat wordcount.py
+    analysis.tar.gz : *.dat cfd.py
 	tar -czf $@ $^
 
 Question: there's still duplication in our makefile, where?
 
 Answer: the program name. Suppose the name of our program changes?
 
-    COUNTER=wordcount.py
+    CFD_SRC=cfd.py
 
 Question: is there an alternative to this?
 
 Answer: we might change our programming language or the way in which our command is invoked:
 
-    COUNTER=python wordcount.py
-
+    CFD_SRC=cfd.py
+    CFD_EXE=python $(CFD_SRC)
+    
 Exercise 3 - use a macro
 ------------------------
 
@@ -255,19 +252,21 @@ See [exercises](MakeExercises.md).
 
 Solution:
 
-    COUNTER=wordcount.py
+    # CFD analysis
+    CFD_SRC=cfd.py
+    CFD_EXE=python $(CFD_SRC)
 
-    # Calculate word frequencies.
-    %.dat : books/%.txt $(COUNTER)
-        python $(COUNTER) $< $@
+    %.dat : configs/%.cfg $(CFD_SRC)
+        $(CFD_EXE) $< $@
 
-    analysis.tar.gz : *.dat $(COUNTER)
+    analysis.tar.gz : *.dat $(CFD_SRC)
         tar -czf $@ $^
 
 Keep macros at the top of a Makefile so they are easy to find, or move to `config.mk`:
 
-    # Word frequency calculations.
-    COUNTER=wordcount.py
+    # CFD analysis
+    CFD_SRC=cfd.py
+    CFD_EXE=python $(CFD_SRC)
 
 <p/>
 
@@ -282,7 +281,7 @@ Good programming practice:
 What make will do
 -----------------
 
-    touch books/*.txt
+    touch configs/*.cfg
     make -n analysis.tar.gz  # Display commands make will run
 
 Exercise 4 - add another processing stage
@@ -294,11 +293,13 @@ Solution:
 
 Makefile, `Makefile`:
 
-    # Calculate images
-    %.jpg : %.dat $(PLOTTER)
-        python $(PLOTTER) $< $@
+    # Plot flow.
+    %.jpg : %.dat $(PLOT_SRC)
+        $(PLOT_EXE) $< $@
 
-    analysis.tar.gz : *.dat *.jpg $(COUNTER)
+    all : 32x32.jpg 64x64.jpg 96x96.jpg
+
+    analysis.tar.gz : *.dat *.jpg $(CFD_SRC) $(PLOT_SRC)
         tar -czf $@ $^
 
     clean : 
@@ -308,17 +309,18 @@ Makefile, `Makefile`:
 
 Configuration file, `config.mk`:
 
-    # Image output calculations
-    PLOTTER=plotcount.py
+    # Plot flow
+    PLOT_SRC=plot_flow.py
+    PLOT_EXE=python $(PLOT_SRC)
 
 shell and patsubst
 ------------------
 
 Avoid hard-coding file names:
 
-    TXT_FILES=$(shell find books -type f -name '*.txt')
-    DAT_FILES=$(patsubst books/%.txt, %.dat, $(TXT_FILES))
-    JPG_FILES=$(patsubst books/%.txt, %.jpg, $(TXT_FILES))
+    CFG_FILES=$(shell find configs -type f -name '*.cfg')
+    DAT_FILES=$(patsubst configs/%.cfg, %.dat, $(CFG_FILES))
+    JPG_FILES=$(patsubst configs/%.cfg, %.jpg, $(CFG_FILES))
 
     .PHONY : dats
     dats : $(DAT_FILES)

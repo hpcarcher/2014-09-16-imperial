@@ -1,8 +1,8 @@
 include config.mk
 
-TXT_FILES=$(shell find books -type f -name '*.txt')
-DAT_FILES=$(patsubst books/%.txt, %.dat, $(TXT_FILES))
-JPG_FILES=$(patsubst books/%.txt, %.jpg, $(TXT_FILES))
+CFG_FILES=$(shell find configs -type f -name '*.cfg')
+DAT_FILES=$(patsubst configs/%.cfg, %.dat, $(CFG_FILES))
+JPG_FILES=$(patsubst configs/%.cfg, %.jpg, $(CFG_FILES))
 
 .PHONY : dats
 dats : $(DAT_FILES)
@@ -10,15 +10,18 @@ dats : $(DAT_FILES)
 .PHONY : jpgs
 jpgs : $(JPG_FILES)
 
-# Calculate word frequencies.
-%.dat : books/%.txt $(COUNTER)
-	python $(COUNTER) $< $@
+# Determine flow pattern.
+%.dat : configs/%.cfg $(CFD_SRC)
+	$(CFD_EXE) $< $@
 
-# Calculate images
-%.jpg : %.dat $(PLOTTER)
-	python $(PLOTTER) $< $@
+# Plot flow.
+%.jpg : %.dat $(PLOT_SRC)
+	$(PLOT_EXE) $< $@
 
-analysis.tar.gz : *.dat *.jpg $(COUNTER)
+.PHONY : all
+all : jpgs
+
+analysis.tar.gz : $(DAT_FILES) $(JPG_FILES) $(CFD_SRC) $(PLOT_SRC)
 	tar -czf $@ $^
 
 clean : 
