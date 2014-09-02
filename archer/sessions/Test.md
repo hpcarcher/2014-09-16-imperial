@@ -70,9 +70,12 @@ Introducing tests from the outside-in
 End-to-end tests and Python
 ----------------------------
 
-Count the words in a text file and output their frequencies:
+Determine a flow pattern:
 
-    python wordcount.py books/war.txt war.dat"
+    python cfd.py configs/32x32.cfg 32x32.dat
+    head 32x32.dat
+    python cfd.py configs/32x32.cfg 32x32.dat quiet
+    head 32x32.dat
 
 Question: what is possibly the simplest test we could do? 
 
@@ -80,7 +83,7 @@ Answer: check there is an output file produced for a valid input file
 
 Use Python to write end-to-end tests. Program being tested does not have to be Python. Can use the same approach using shell scripts.
 
-Create `test_wordcount_end_to_end.py`:
+Create `test_cfd_end_to_end.py`:
 
     import os
     import os.path
@@ -95,19 +98,19 @@ Create `test_wordcount_end_to_end.py`:
       if f.endswith(".dat"):
         os.remove(f)
 
-    print "Test war"
-    os.system("python wordcount.py books/war.txt war.dat")
-    file_exists("war.dat")
+    print "Test 32x32"
+    os.system("python cfd.py configs/32x32.cfg 32x32.dat quiet")
+    file_exists("32x32.dat")
 
 Use functions as these commands will be called more than once - anticipate reuse.
 
-    python test_wordcount_end_to_end.py
+    python test_cfd_end_to_end.py
 
 <p/>
 
-    print "Test abyss"
-    os.system("python wordcount.py books/abyss.txt abyss.dat")
-    file_exists("abyss.dat")
+    print "Test 64x64"
+    os.system("python cfd.py configs/64x64.cfg 64x64.dat quiet")
+    file_exists("64x64.dat")
 
 Tests that code, or functions, work with valid inputs are complemented by tests that they fail with invalid inputs.
 
@@ -125,7 +128,7 @@ Solution:
         print "OK ", filename, "does not exist"
 
     print "Test none"
-    os.system("python wordcount.py books/none none.dat")
+    os.system("python cfd.py configs/none.cfg none.dat")
     file_not_exists("none.dat")
 
 Check actual outputs against expected outputs
@@ -133,26 +136,27 @@ Check actual outputs against expected outputs
 
 Create expected outputs:
 
-    make abyss.dat
-    make bridge.dat
-    make war.dat
-    make kim.dat
+    make 32x32.dat
+    make 64x64.dat
+    make 64x64x20.dat
+    make 96x96.dat
 
 Or:
 
-    python wordcount.py books/abyss.txt abyss.dat
-    python wordcount.py books/bridge.txt bridge.dat
-    python wordcount.py books/kim.txt kim.dat
-    python wordcount.py books/war.txt war.dat
+    python cfd.py configs/32x32.cfg 32x32.dat quiet
+    python cfd.py configs/64x64.cfg 64x64.dat quiet
+    python cfd.py configs/64x64x20.cfg 64x64x20.dat quiet
+    python cfd.py configs/96x96.cfg 96x96.dat quiet
 
 <p/>
 
     mkdir expected/
     mv *.dat expected/
 
-    python wordcount.py books/abyss.txt abyss.dat
-    diff abyss.dat expected/abyss.dat              # Compare files for equality
-    diff -q abyss.dat expected/abyss.dat           # Return result only
+    python cfd.py configs/64x64.cfg 64x64.dat
+    diff 64x64.dat expected/64x64.dat              # Compare files for equality
+    diff -q 64x64.dat expected/64x64.dat           # Return result only
+    diff -q 64x64.dat expected/32x32.dat           # Return result only
 
 `os.system` returns the command's exit code, `0` for OK, and non-zero for errors.
 
@@ -164,36 +168,41 @@ Or:
       else:
         print "FAIL ", file1, "does not equal", file2
 
-    files_equal("war.dat", "expected/war.dat")
-    files_equal("abyss.dat", "expected/abyss.dat")
+    files_equal("32x32.dat", "expected/32x32.dat")
+    files_equal("64x64.dat", "expected/64x64.dat")
 
 Reduce duplicated code and loop over files:
 
-    for f in os.listdir("books"):
-      if f.endswith(".txt"):
+    for f in os.listdir("configs"):
+      if f.endswith(".cfg"):
         name = os.path.splitext(f)[0]
-        txt = os.path.join("books",f)
+        cfg = os.path.join("configs",f)
         dat = name + ".dat"
-        cmd = "python wordcount.py " + txt + " " + dat
+        cmd = "python cfd.py " + cfg + " " + dat + " quiet"
         os.system(cmd)
         file_exists(dat)
         expected = os.path.join("expected", dat)
         files_equal(dat,expected)
 
-Exercise 2 - recode `wordcount.py`
-----------------------------------
+Exercise 2 - recode `cfd.py`
+----------------------------
 
 See [exercises](TestExercises.md).
 
 Solution:
 
-    DELIMITERS=".,;:?$@^<>#%`!*-=()[]{}/\"\'"
-    TRANSLATE_TABLE = string.maketrans(DELIMITERS, len(DELIMITERS) * " ")
+        # Iterate for number of iterations
+        for iter in range(niter):
 
-    def update_word_counts(line, counts):
-      line = string.translate(line, TRANSLATE_TABLE) 
-      words = line.split()
-      ...
+            # Loop over the elements computing the stream function
+            for i in range(1,m+1):
+                for j in range(1,n+1):
+                    tmp[i][j] = 0.25 * (psi[i+1][j]+psi[i-1][j]+psi[i][j+1]+psi[i][j-1])
+
+            # Update psi
+            for i in range(1,m+1):
+                for j in range(1,n+1):
+                    psi[i][j] = tmp[i][j]
 
 Test structure
 --------------
@@ -219,17 +228,23 @@ Add meta-data to record the provenance of the output data file.
 
     import datetime
 
-    f.write("# Frequency data\n")
-    f.write("# Created by: %s\n" % __file__)
-    f.write("# Input data: %s\n" % file)
-    f.write("# Date: %s\n" % datetime.datetime.today())
-    f.write("# Format: word frequency\n")
+    write_data(m, n, psi, config_file, dat_file)
+
+    def write_data(m, n, psi, config_file, outfile):
+
+        # Open the specified file
+        out = open(outfile, "w")
+
+        out.write("# Created by: %s\n" % __file__)
+        out.write("# Input data: %s\n" % config_file)
+        out.write("# Date: %s\n" % datetime.datetime.today())
+        out.write("# Format: word frequency\n")
 
 <p/>
 
-    python wordcount.py books/abyss.txt abyss.dat
-    head abyss.dat
-    python test_wordcount_end_to_end.py
+    python cfd.py configs/64x64.cfg 64x64.dat
+    head 64x64.dat
+    python test_cfd_end_to_end.py
 
 Question: what is the problem?
 
@@ -297,7 +312,7 @@ Answer: they were run on different numbers on processors e.g. 2x1, 4x2 etc.
 
 <p/>
 
-    python test_wordcount_end_to_end.py
+    python test_cfd_end_to_end.py
 
 <p/>
 
@@ -313,7 +328,7 @@ Testing at finer-granularities - towards unit tests
 * Quicker to discover a problem when testing a 10 line function in isolation then testing it as part of an end-to-end application which may take 1 hour to run and may not even, depending upon the inputs, invoke that function. 
 * Finest level of granularity is a unit test where a unit is the smallest testable part of an application e.g. function or module, method or class.
 
-Exercise 3 - propose some tests for `wordcount.py`
+Exercise 3 - propose some tests for `cfd.py`
 --------------------------------------------------
 
 See [exercises](TestExercises.md).
@@ -365,7 +380,7 @@ Solution (examples):
 A unit test for `add_frequencies`
 ---------------------------------
 
-Create `test_wordcount.py`:
+Create `test_cfd.py`:
 
     from wordcount import update_word_counts
 
@@ -385,11 +400,11 @@ Python [nose](https://pypi.python.org/pypi/nose/) library includes tests for equ
 
 <p/>
 
-    python test_wordcount.py
+    python test_cfd.py
 
 `nosetests` automatically finds, runs and reports on tests.
 
-    nosetests test_wordcount.py
+    nosetests test_cfd.py
 
 `.` denotes successful test function calls.
 
@@ -399,7 +414,7 @@ Remove `test_update_word_counts()` call.
 
 <p/>
 
-    python test_wordcount.py
+    python test_cfd.py
 
 <p/>
 
@@ -416,7 +431,7 @@ Remove `test_update_word_counts()` call.
 
 xUnit test report, standard format, convert to HTML, present online.
 
-    nosetests --with-xunit test_wordcount.py
+    nosetests --with-xunit test_cfd.py
     cat nosetests.xml
 
 Defensive programming
@@ -455,7 +470,7 @@ Help other developers understand program and whether their understanding matches
       counts = [("software", 1), ("software", -4)]
       assert_raises(AssertionError, calculate_percentages, counts)
 
-Exercise 4 - write more unit tests for `wordcount.py`
+Exercise 4 - write more unit tests for `cfd.py`
 -----------------------------------------------------
 
 See [exercises](TestExercises.md).
