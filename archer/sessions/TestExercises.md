@@ -34,7 +34,7 @@ With the simple test harness in-place recode, `jacoby.py`:
 Exercise 3 - propose unit tests for `cfd.py` and `jacobi.py`
 ------------------------------------------------------------
 
-With a partner, or in threes, write down possible tests for each function in `cfd.py` and `jacobi.py`.
+With a partner, or in threes, note down possible tests for each function in `cfd.py` and `jacobi.py`.
 
 Remember that testing with invalid arguments or boundary conditions can be as important if testing with valid arguments one knows to be correct.
 

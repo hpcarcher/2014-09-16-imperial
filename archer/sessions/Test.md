@@ -191,18 +191,16 @@ See [exercises](TestExercises.md).
 
 Solution:
 
-        # Iterate for number of iterations
-        for iter in range(niter):
+    for iteration in range(num_iterations):
+      update_stream_function(width, height, psi)
 
-            # Loop over the elements computing the stream function
-            for i in range(1,m+1):
-                for j in range(1,n+1):
-                    tmp[i][j] = 0.25 * (psi[i+1][j]+psi[i-1][j]+psi[i][j+1]+psi[i][j-1])
+    for i in range(1, height+1):
+      for j in range(1, width+1):
+        tmp[i][j] = 0.25 * (psi[i+1][j]+psi[i-1][j]+psi[i][j+1]+psi[i][j-1])
 
-            # Update psi
-            for i in range(1,m+1):
-                for j in range(1,n+1):
-                    psi[i][j] = tmp[i][j]
+    for i in range(1, height+1):
+      for j in range(1, width+1):
+        psi[i][j] = tmp[i][j]
 
 Test structure
 --------------
@@ -228,19 +226,17 @@ Add meta-data to record the provenance of the output data file.
 
     import datetime
 
-    write_data(m, n, psi, config_file, dat_file)
+    write_data(width, height, psi, config, dat_file)
 
-    def write_data(m, n, psi, config_file, outfile):
+    def write_data(width, height, psi, config, dat_file):
 
-        # Open the specified file
-        out = open(outfile, "w")
-
-        out.write("# Created by: %s\n" % __file__)
-        out.write("# Input data: %s\n" % config_file)
-        out.write("# Date: %s\n" % datetime.datetime.today())
-        out.write("# Format: word frequency\n")
-
-<p/>
+    out.write("# Created by: {0}\n".format(__file__))
+    out.write("# Date: {0}\n".format(datetime.datetime.today()))
+    out.write("# Grid size: {0} x {1}\n".format(width, height))
+    out.write("# Inlet X: {0}\n".format(config['inlet_x']))
+    out.write("# Inlet width: {0}\n".format(config['inlet_width']))
+    out.write("# Outlet Y: {0}\n".format(config['outlet_y']))
+    out.write("# Outlet width: {0}\n".format(config['outlet_height']))
 
     python cfd.py configs/64x64.cfg 64x64.dat
     head 64x64.dat
@@ -316,6 +312,7 @@ Answer: they were run on different numbers on processors e.g. 2x1, 4x2 etc.
 
 <p/>
 
+    assert_equal(expected, psi)
     np.testing.assert_allclose(file21, file42, rtol=0, atol=1e-7)
 
 What is a suitable threshold for equality? That is application-specific - for some domains round to the nearest whole number, for others be far, far more accurate.
@@ -328,75 +325,90 @@ Testing at finer-granularities - towards unit tests
 * Quicker to discover a problem when testing a 10 line function in isolation then testing it as part of an end-to-end application which may take 1 hour to run and may not even, depending upon the inputs, invoke that function. 
 * Finest level of granularity is a unit test where a unit is the smallest testable part of an application e.g. function or module, method or class.
 
-Exercise 3 - propose some tests for `cfd.py`
---------------------------------------------------
+Exercise 3 - propose unit tests for `cfd.py` and `jacobi.py`
+------------------------------------------------------------
 
 See [exercises](TestExercises.md).
 
-Solution (examples):
+Some example solutions (there are many more)
 
-`load_text(file)`
+`set_inlet_boundary`
 
-* A file returns a list of length equal to the number of lines in the file.
-* An empty file returns an empty list.
-* A non-existent file raises an error.
+* The values of the stream function on the top edge are initialised as
+  expected. 
+* An inlet that goes out of the bounds of the box results in an
+  error.  
 
-`save_word_counts(file, counts)`
+`set_outlet_boundary`
 
-* An empty list results in an empty file.
-* A non-empty list results in a file with a number of lines equal to the number of tuples + 5 (for the meta-data lines).
+* The values of the stream function on the right edge are initialised
+  as expected. 
+* An outlet that goes out of the bounds of the box results in an
+  error.  
 
-`load_word_counts(file)`
+`update_stream_function`
 
-* A file with no comments (prefixed by `#`) returns a list of length equal to the number of lines in the file.
-* A file only with comments returns an empty list.
-* An empty file returns an empty list.
-* A non-existent file raises an error.
+* Given a stream function with known values then, after the function
+  call, the stream function contains new values equal to those we
+  have pre-computed.
+* Given a stream function that is all zeros then, after the function
+  call, it is still all zeroes.
+* Given a stream function that is all ones then, after the function
+  call, it is still all zeroes.
+* Given a stream function that is an empty list, then, after the
+  call, it is still an empty list.
 
-`update_word_counts(line, counts)`
+`write_data`
 
-* A sentence of distinct words and an empty dictionary of frequencies results in a dictionary with an entry for each word with a count of 1.
-* A zero-length sentence and an empty dictionary of frequencies results in an empty dictionary of frequencies.
-* A sentence of delimiters and an empty dictionary of frequencies results in an empty dictionary of frequencies.
-* A sentence of distinct words and a dictionary with entries for all of those words results in each count in the dictionary being increased by 1.
+* Given zero width and height and an empty stream function then a
+  file is saved which has width and height zero.
+* Given a 1x1 grid and a 3x3 stream function that is all zeros then a
+  file is saved that has contents:
 
-`calculate_word_counts(lines)`:
+<p/>
 
-* An empty list returns an empty dictionary.
-* Other tests as for `update_word_counts` but across a number of lines.
+    1 1
+    0  0  0.00000 0.00000 0.00000
 
-`word_count_dict_to_tuples(counts, decrease = True)`:
+* Given a 2x2 grid and a4x4 stream function that is all ones then a
+  file is saved that has contents:
 
-* An empty dictionary returns an empty list.
-* A dictionary of words all with equal counts returns a list of tuples, one for each word.
-* A dictionary of words with distinct counts returns list of tuples in descending order.
-* A dictionary of words with distinct counts returns list of tuples in ascending order if `decrease = False`.
+<p/>
 
-`filter_word_counts(counts, min_length = 1)`
+    2 2
+    0     0    0.00000    0.00000    0.00000
+    0     1    0.00000    0.00000    0.00000
+    1     0    0.00000    0.00000    0.00000
+    1     1    0.00000    0.00000    0.00000
 
-* An empty list returns an empty list.
-* A list of tuples of words of length 3 or less, returns an empty list if `min_length = 3`.
-
-A unit test for `add_frequencies`
----------------------------------
+A unit test for `update_stream_function`
+----------------------------------------
 
 Create `test_cfd.py`:
 
-    from wordcount import update_word_counts
-
-    def test_update_word_counts():
-      line = "software! software! software!"
-      counts = {}
-      update_word_counts(line, counts)
+    from jacobi import update_stream_function
 
 Python [nose](https://pypi.python.org/pypi/nose/) library includes tests for equality, inequality, boolean values, thrown exceptions etc.
 
     from nose.tools import assert_equal
 
-    assert_equal(1, len(counts))
-    assert_equal(3, counts.get("software"))
+We'll be using floating points too:
 
-    test_update_word_counts()
+    import numpy as np
+
+    def test_empty_psi():
+      psi=[]
+      update_stream_function(0, 0,psi)
+      assert_equal([], psi)
+
+    def test_zero_psi():
+      psi = [[0 for col in range(3)] for row in range(3)]
+      expected = [[0 for col in range(3)] for row in range(3)]
+      update_stream_function(1, 1, psi)
+      np.testing.assert_allclose(expected, psi, rtol=0, atol=0.01)
+
+    test_empty_psi()
+    test_zero_psi()
 
 <p/>
 
@@ -410,7 +422,7 @@ Python [nose](https://pypi.python.org/pypi/nose/) library includes tests for equ
 
 Uses 'reflection' to find out the test functions - `test_` function, module and file prefixes.
 
-Remove `test_update_word_counts()` call.
+Remove `test_` calls.
 
 <p/>
 
@@ -418,14 +430,57 @@ Remove `test_update_word_counts()` call.
 
 <p/>
 
-    def test_update_word_counts_distinct():
-      line = "software carpentry software training"
-      counts = {}
-      update_word_counts(line, counts)
-      assert_equal(3, len(counts))
-      assert_equal(2, counts.get("software"))
-      assert_equal(1, counts.get("carpentry"))
-      assert_equal(1, counts.get("training"))
+Looking at how the the stream function is updated, for each value not
+on the boundaries of the box, it sums the four neighbours then
+multiplies by 0.25. If the stream function is all ones then the centre
+values will have value (1+1+1+1)*0.25 = 1. So given a stream function
+of all ones we expect `update_stream_function` to be the identity
+function:
+
+    def test_ones_psi():
+      psi = [[1 for col in range(5)] for row in range(5)]
+      expected = [[1 for col in range(5)] for row in range(5)]
+      update_stream_function(3, 3,psi)
+      np.testing.assert_allclose(expected, psi, rtol=0, atol=0.01)
+
+Another example with pre-calculated values. Given:
+
+    # 0 0 1 0 0
+    # 0 0 1 0 0
+    # 0 0 1 1 1
+    # 0 0 0 0 0
+    # 0 0 0 0 0
+
+Then we expect:
+
+    # 0 0    1    0    0
+    # 0 0.25 0.5  0.5  0
+    # 0 0.25 0.5  0.5  1
+    # 0 0    0.25 0.25 0
+    # 0 0    0    0    0
+
+Test function:
+
+    def test_psi():
+      psi = [[0 for col in range(5)] for row in range(5)]
+      expected = [[0 for col in range(5)] for row in range(5)]
+      psi[0][2] = 1
+      psi[1][2] = 1
+      psi[2][2] = 1
+      psi[2][3] = 1
+      psi[2][4] = 1
+      expected[0][2] = 1
+      expected[1][1] = 0.25
+      expected[1][2] = 0.5
+      expected[1][3] = 0.5
+      expected[2][1] = 0.25
+      expected[2][2] = 0.5
+      expected[2][3] = 0.5
+      expected[2][4] = 1
+      expected[3][2] = 0.25
+      expected[3][3] = 0.25
+      update_stream_function(3, 3, psi)
+      np.testing.assert_allclose(expected, psi, rtol=0, atol=0.01)
 
 `nose` is an [xUnit test framework](http://en.wikipedia.org/wiki/XUnit). Others are JUnit, CUnit, google-test, FRUIT, pFUnit etc.
 
@@ -437,20 +492,29 @@ xUnit test report, standard format, convert to HTML, present online.
 Defensive programming
 ---------------------
 
-Suppose an invalid set of counts are passed to `calculate_percentages`:
+Suppose an invalid set of values are passed to `cfd` e.g. the inlet
+width extends beyond the end of the box:
 
-    from wordcount import calculate_percentages
-
-    counts = [("software", 1), ("software", -4)]
-    print calculate_percentages(counts)
+    python
+    from cfd import cfd
+    cfd(1000, 32, 20, 20, 5, 15, "out.dat")  
+    CTRL-D
 
 Assume that mistakes will happen and guard against them. Defensive programming.
 
-    def calculate_percentages(counts):
-      total = 0
-      for count in counts:
-        assert count[1] >= 0
-        total += count[1]
+    def cfd(iterations, edge, inlet_x, inlet_width, outlet_y, outlet_height, dat_file, quiet=True):
+
+      assert inlet_x <= width
+      assert inlet_x + inlet_width < width
+      assert outlet_y <= height
+      assert outlet_y + outlet_height < height
+
+Try again:
+
+    python
+    from cfd import cfd
+    cfd(1000, 32, 20, 20, 5, 15, "out.dat")  
+    CTRL-D
 
 Programs like Firefox  are full of assertions: 10-20% of their code is to check that the other 80-90% is working correctly.
 
@@ -465,13 +529,13 @@ Types:
 Help other developers understand program and whether their understanding matches the code. Users should never see these sorts of failure!
 
     from nose.tools import assert_raises
+    from cfd import cfd
 
-    def test_calculate_percentages_invalid():
-      counts = [("software", 1), ("software", -4)]
-      assert_raises(AssertionError, calculate_percentages, counts)
+    def test_cfd_invalid_inlet_width():
+      assert_raises(AssertionError, cfd, 1000, 32, 20, 20, 5, 15, "out.dat")  
 
-Exercise 4 - write more unit tests for `cfd.py`
------------------------------------------------------
+Exercise 4 - implement unit tests for `cfd.py` and `jacobi.py`
+--------------------------------------------------------------
 
 See [exercises](TestExercises.md).
 
@@ -505,8 +569,8 @@ Review tests and avoid tests that:
 <p/>
 
     def test_critical_correctness():
-        # TODO - will complete this tomorrow!
-        pass
+      # TODO - will complete this tomorrow!
+      pass
 
 Conclusion
 ----------
@@ -532,4 +596,4 @@ When to finish:
 
 "If it's not tested, it's broken" - Bruce Eckel, in [Thinking in Java, 3rd Edition](http://www.mindview.net/Books/TIJ/).
 
-["Testing is science"](http://maori.geek.nz/post/testing_your_code_is_doing_science) - Graham Jenson.Check scripts and code:
+["Testing is science"](http://maori.geek.nz/post/testing_your_code_is_doing_science) - Graham Jenson.
