@@ -1,28 +1,42 @@
-# 
-# Jacobi function for CFD calculation
-#
-# Basic Python version using lists
-#
-def jacobi(niter, psi):
+"""
+Computational Fluid Dynamics JACOBI functions.
 
-    # Get the inner dimensions
-    m = len(psi) - 2
-    n = len(psi[0]) -2
+Written by EPCC 2014.
+"""
 
-    # Define the temporary array and zero it
-    tmp = [[0 for col in range(m+2)] for row in range(n+2)]
+def jacobi(num_iterations, psi):
+    """
+    Update stream function across a number of iterations.
 
-    # Iterate for number of iterations
-    for iter in range(niter):
+    Keyword arguments:
+    num_iterations -- number of iterations.
+    psi -- 2D array of initial stream function values.
+    """
+    
+    # Get the box dimensions.
+    height = len(psi) - 2
+    width = len(psi[0]) - 2
 
-        # Loop over the elements computing the stream function
-        for i in range(1,m+1):
-            for j in range(1,n+1):
-                tmp[i][j] = 0.25 * (psi[i+1][j]+psi[i-1][j]+psi[i][j+1]+psi[i][j-1])
+    for iteration in range(num_iterations):
+	update_stream_function(width, height, psi)
 
-        # Update psi
-        for i in range(1,m+1):
-            for j in range(1,n+1):
-                psi[i][j] = tmp[i][j]
+def update_stream_function(width, height, psi):
+    """
+    Update stream function over a single iteration.
 
+    Keyword arguments:
+    width -- box width.
+    height -- box height.
+    psi -- 2D array of stream function values.
+    """
+    
+    tmp = [[0 for col in range(width+2)] for row in range(height+2)]
+    # Calculate updated stream function into tmp.
+    for i in range(1, height+1):
+        for j in range(1, width+1):
+	    tmp[i][j] = 0.25 * (psi[i+1][j]+psi[i-1][j]+psi[i][j+1]+psi[i][j-1])
 
+    # Update stream function using tmp.
+    for i in range(1, height+1):
+        for j in range(1, width+1):
+	    psi[i][j] = tmp[i][j]
