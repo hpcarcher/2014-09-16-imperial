@@ -535,3 +535,8 @@ Now, we have a script that does our analysis that we can rerun as and when desir
  * Not-invented-here can incur a lot of reinventing the wheel, more poorly than existing inventions.
  * A lot of software development involves taking off-the-shelf libraries and gluing them together.
  * Readability versus efficiency is a commonly-occurring trade-off.
+
+## Links and resources
+
+ * http://scipy-lectures.github.io/intro/index.html
+ * https://github.com/jrjohansson/scientific-python-lectures/blob/master/README.md
