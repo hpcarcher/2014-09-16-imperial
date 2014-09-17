@@ -133,7 +133,7 @@ Add directory to repository:
 
 <p>
 
-    git commit -m "Added link to image of my soup." recipie.md
+    git commit -m "Added link to image of my soup." soup.md
 
 What to commit:
 
